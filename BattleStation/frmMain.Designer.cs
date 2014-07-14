@@ -39,7 +39,7 @@
             this.btnStart.TabIndex = 0;
             this.btnStart.Text = "Run";
             this.btnStart.UseVisualStyleBackColor = true;
-            this.btnStart.Click += new System.EventHandler(this.button1_Click);
+            this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
             // 
             // frmMain
             // 
