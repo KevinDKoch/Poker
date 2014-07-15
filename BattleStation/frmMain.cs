@@ -38,19 +38,29 @@ namespace BattleStation
                 Console.WriteLine("OH NO, NOT CONNECTED!");
             }
                 
-            conn.Close();
-                
+            //Query for some hands
+            string sql = 
+                "SELECT " +
+                "history " +
+                "FROM " +
+                "cash_hand_histories, cash_hand_player_statistics " +
+                "WHERE " +
+                "cash_hand_histories.id_hand = cash_hand_player_statistics.id_hand AND " + 
+                "cash_hand_player_statistics.id_player = 2 AND " + 
+                "cash_hand_player_statistics.date_played >= '2014/07/05 04:00:00'";
 
+            //Load the hands
+            NpgsqlDataAdapter da = new NpgsqlDataAdapter(sql, conn);
+            da.Fill(ds);
+            dt = ds.Tables[0];
 
-            //NpgsqlDataAdapter da = new NpgsqlDataAdapter(SqlDbType, conn);
-            
+            dgvSQLResults.DataSource = dt;
 
-
-
-            //Query for new hands
-            //Add active players
-            //Get data for new players
-
+            //Add hands to players
+            //Update stats
+            //Update listeners
+ 
+            conn.Close();                            
         }
     }
 }
