@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Npgsql;
+using PokerLib2;
 
 namespace BattleStation
 {
@@ -61,6 +62,41 @@ namespace BattleStation
             //Update listeners
  
             conn.Close();                            
+        }
+
+        private void btnTestParse_Click(object sender, EventArgs e)
+        {
+            string HH = "***** Hand History for Game 33333333333 *****\r\n" +
+                        "$5/$10 USD NL Texas Hold'em - Monday, July 07, 15:16:05 EDT 2014\r\n" +
+                        "Table Epping Forest (Real Money)\r\n" +
+                        "Seat 1 is the button\r\n" +
+                        "Total number of players : 2/2\r\n" +
+                        "Seat 1: Fake_Bingo ( $1,170.25 USD )\r\n" +
+                        "Seat 2: Fake_Buddy ( $2,921.38 USD )\r\n" +
+                        "Fake_Bingo posts small blind [$5 USD].\r\n" +
+                        "Fake_Buddy posts big blind [$10 USD].\r\n" +
+                        "** Dealing down cards **\r\n" +
+                        "Dealt to Fake_Bingo [  Ac Ad ]\r\n" +
+                        "Fake_Bingo raises [$20 USD]\r\n" +
+                        "Fake_Buddy raises [$75 USD]\r\n" +
+                        "Fake_Bingo will be using his time bank for this hand.\r\n" +
+                        "Fake_Bingo raises [$175 USD]\r\n" +
+                        "Fake_Buddy calls [$115 USD]\r\n" +
+                        "** Dealing Flop ** [ 9s, 6h, Js ]\r\n" +
+                        "Fake_Buddy checks\r\n" +
+                        "Fake_Bingo will be using his time bank for this hand.\r\n" +
+                        "Fake_Bingo bets [$199.50 USD]\r\n" +
+                        "Fake_Buddy raises  [$1,500.01 USD]\r\n" +
+                        "Fake_Bingo is all-In  [$770.75 USD]\r\n" +
+                        "** Dealing Turn ** [ 3s ]\r\n" +
+                        "** Dealing River ** [ 6s ]\r\n" +
+                        "Fake_Bingo shows [ Ac, Ad ]two pairs, Aces and Sixes.\r\n" +
+                        "Fake_Buddy shows [ Jc, Qc ]two pairs, Jacks and Sixes.\r\n" +
+                        "Fake_Buddy wins $1,751.13 USD from the side pot 1 with two pairs, Jacks and Sixes.\r\n" +
+                        "Fake_Bingo wins $2,339.50 USD from the main pot with two pairs, Aces and Sixes.";
+
+            Hand H = new Hand(HH, new PokerSite("Party", 200), HHSource.Raw);
+
         }
     }
 }
