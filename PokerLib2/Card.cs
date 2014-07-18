@@ -11,22 +11,36 @@ namespace PokerLib2
 
     class Card
     {
-        protected Rank _Rank;
-        protected Suit _Suit;
+        protected Rank _rank;
+        protected Suit _suit;
 
-        public Rank Rank { get { return _Rank; } }
-        public Suit Suit { get { return _Suit; } }
+        public Rank Rank { get { return _rank; } }
+        public Suit Suit { get { return _suit; } }
 
         public Card(Rank rank, Suit suit)
         {
-            _Rank = rank;
-            _Suit = suit;
+            _rank = rank;
+            _suit = suit;
+        }
+
+        public Card(string card)
+        {
+            Deck deck = new Deck();
+            foreach (Card c in deck.Cards)
+            {
+                if (card == c.ToString())
+                {
+                    _rank = c.Rank;
+                    _suit = c.Suit;
+                    break;
+                }
+            }
         }
 
         public override string ToString()
         {
             string name = "Unknown Rank";
-            switch (_Rank)
+            switch (_rank)
             {
                 case Rank.Two:
                     name = "2";
@@ -71,7 +85,7 @@ namespace PokerLib2
                     throw new Exception("Unknown Card Rank.");
             }
 
-            switch (_Suit)
+            switch (_suit)
             {
                 case Suit.Clubs:
                     name += "c";

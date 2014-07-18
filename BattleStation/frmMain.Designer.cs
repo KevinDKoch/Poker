@@ -32,6 +32,8 @@
             this.pTable = new System.Windows.Forms.Panel();
             this.dgvSQLResults = new System.Windows.Forms.DataGridView();
             this.btnTestParse = new System.Windows.Forms.Button();
+            this.btnBatchParse = new System.Windows.Forms.Button();
+            this.txtParseCount = new System.Windows.Forms.TextBox();
             this.pTable.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSQLResults)).BeginInit();
             this.SuspendLayout();
@@ -74,11 +76,31 @@
             this.btnTestParse.UseVisualStyleBackColor = true;
             this.btnTestParse.Click += new System.EventHandler(this.btnTestParse_Click);
             // 
+            // btnBatchParse
+            // 
+            this.btnBatchParse.Location = new System.Drawing.Point(233, 47);
+            this.btnBatchParse.Name = "btnBatchParse";
+            this.btnBatchParse.Size = new System.Drawing.Size(75, 24);
+            this.btnBatchParse.TabIndex = 3;
+            this.btnBatchParse.Text = "Batch Parse";
+            this.btnBatchParse.UseVisualStyleBackColor = true;
+            this.btnBatchParse.Click += new System.EventHandler(this.btnBatchParse_Click);
+            // 
+            // txtParseCount
+            // 
+            this.txtParseCount.Location = new System.Drawing.Point(152, 50);
+            this.txtParseCount.Name = "txtParseCount";
+            this.txtParseCount.Size = new System.Drawing.Size(75, 20);
+            this.txtParseCount.TabIndex = 4;
+            this.txtParseCount.Text = "1000";
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(606, 409);
+            this.Controls.Add(this.txtParseCount);
+            this.Controls.Add(this.btnBatchParse);
             this.Controls.Add(this.btnTestParse);
             this.Controls.Add(this.pTable);
             this.Controls.Add(this.btnStart);
@@ -87,6 +109,7 @@
             this.pTable.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvSQLResults)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -96,6 +119,8 @@
         private System.Windows.Forms.Panel pTable;
         private System.Windows.Forms.DataGridView dgvSQLResults;
         private System.Windows.Forms.Button btnTestParse;
+        private System.Windows.Forms.Button btnBatchParse;
+        private System.Windows.Forms.TextBox txtParseCount;
     }
 }
 

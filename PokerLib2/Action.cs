@@ -6,8 +6,15 @@ using System.Threading.Tasks;
 
 namespace PokerLib2
 {
-    abstract public class Action
+    public abstract class Action
     {
+        protected GameState _curGameState;
+        public GameState CurrentGameState { get { return _curGameState; } }
 
+        public Action(GameState gameState)
+        {
+            _curGameState = gameState;
+        }
     }
+
 }

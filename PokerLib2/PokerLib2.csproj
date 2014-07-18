@@ -42,6 +42,8 @@
     <Compile Include="Action.cs" />
     <Compile Include="Card.cs" />
     <Compile Include="DealerAction.cs" />
+    <Compile Include="Deck.cs" />
+    <Compile Include="GameState.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PlayerAction.cs" />
     <Compile Include="PokerEnums.cs" />

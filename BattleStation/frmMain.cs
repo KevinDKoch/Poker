@@ -95,7 +95,60 @@ namespace BattleStation
                         "Fake_Buddy wins $1,751.13 USD from the side pot 1 with two pairs, Jacks and Sixes.\r\n" +
                         "Fake_Bingo wins $2,339.50 USD from the main pot with two pairs, Aces and Sixes.";
 
-            Hand H = new Hand(HH, new PokerSite("Party", 200), HHSource.Raw);
+            HeadsUpHand H = new HeadsUpHand(HH, new PokerSite("Party", 200), HHSource.Raw);
+            //Query the DB for a bunch of hands and try to parse them
+
+
+        }
+
+        private void btnBatchParse_Click(object sender, EventArgs e)
+        {
+            int limit = Convert.ToInt32(txtParseCount.Text);
+
+            //Connect to the DB
+            DataSet ds = new DataSet();
+            DataTable dt = new DataTable();
+
+            string ConnString = "Server=127.0.0.1;Port=5434;User Id=postgres;Password=svcPASS83;Database=PT4_2014_05_23_120015;";            
+            NpgsqlConnection conn = new NpgsqlConnection(ConnString);
+            conn.Open();
+
+            if (conn.State == System.Data.ConnectionState.Open)
+            {
+                Console.WriteLine("Connected!");
+            }
+            else
+            {
+                Console.WriteLine("OH NO, NOT CONNECTED!");
+            }
+
+            //Query for some hands
+            string sql =
+                "SELECT " +
+                "history " +
+                "FROM " +
+                "cash_hand_histories " +
+                "LIMIT " + limit;
+
+            //Load the hands
+            NpgsqlDataAdapter da = new NpgsqlDataAdapter(sql, conn);
+            da.Fill(ds);
+            dt = ds.Tables[0];
+
+            dgvSQLResults.DataSource = dt;
+
+            Console.WriteLine(dt.Rows.Count);
+
+            conn.Close();                            
+
+            //Parse the hands
+            List<HeadsUpHand> Hands = new List<HeadsUpHand>();
+
+            foreach( DataRow row in dt.Rows){
+                Hands.Add(new HeadsUpHand(row["history"].ToString(), new PokerSite("Party", 200), HHSource.PT4));
+            }
+            
+
 
         }
     }
