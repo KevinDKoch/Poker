@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Action.cs" />
+    <Compile Include="BoardCards.cs" />
     <Compile Include="Card.cs" />
     <Compile Include="DealerAction.cs" />
     <Compile Include="Deck.cs" />

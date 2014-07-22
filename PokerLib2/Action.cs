@@ -13,7 +13,7 @@ namespace PokerLib2
 
         public Action(GameState gameState)
         {
-            _curGameState = gameState;
+            _curGameState = gameState.DeepClone();
         }
     }
 

@@ -9,7 +9,7 @@ namespace PokerLib2
     public enum Rank { Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King, Ace }
     public enum Suit { Clubs, Diamonds, Hearts, Spades }
 
-    class Card
+    public class Card
     {
         protected Rank _rank;
         protected Suit _suit;

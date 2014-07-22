@@ -89,7 +89,8 @@ namespace PokerLib2
         public PostSmallBlind(PlayerInfo player, GameState prevGameState, double amount, bool all_in = false) 
             : base(player, prevGameState, amount, all_in) 
         {
-            player.IsSmallBlind = true;            
+            player.IsSmallBlind = true;
+            _curGameState.ActivePlayers += 1;
         }
     }
 
@@ -98,7 +99,8 @@ namespace PokerLib2
         public PostBigBlind(PlayerInfo player, GameState prevGameState, double amount, bool all_in = false) 
             : base(player, prevGameState, amount, all_in) 
         {
-            player.IsBigBlind = true;            
+            player.IsBigBlind = true;
+            _curGameState.ActivePlayers += 1;
         }
     }
 

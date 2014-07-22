@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PokerLib2
 {    
-    abstract class DealerAction : Action
+    public abstract class DealerAction : Action
     {        
         protected DealerAction( GameState prevGameState)
             : base(prevGameState)
@@ -14,7 +14,7 @@ namespace PokerLib2
         }
     }
 
-    abstract class Deal : DealerAction
+    public abstract class Deal : DealerAction
     {
         protected List<Card> _cards;
         public List<Card> Cards { get { return _cards; } }
@@ -96,4 +96,19 @@ namespace PokerLib2
             _nextGameNum = nextGameNum;
         }
     }
+
+    public class TimeBankActivationWarning : DealerAction
+    {
+        private int _secondsUntilActivation;
+        public int SecondsUntilActivation { get { return _secondsUntilActivation; } }
+
+        public TimeBankActivationWarning( int secondsUntilActivation, GameState prevGameState) 
+            : base (prevGameState)
+        {
+            _secondsUntilActivation = secondsUntilActivation;
+        }
+
+
+    }
+
 }

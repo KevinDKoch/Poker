@@ -21,7 +21,7 @@ namespace PokerLib2
         protected PlayerList _players = new PlayerList();
         protected List<Action> _actions = new List<Action>();
 
-        public enum Street {PreFlop, Flop, Turn, River}
+        //public enum Street {PreFlop, Flop, Turn, River}
 
         //Players
         //Board
@@ -169,7 +169,14 @@ namespace PokerLib2
                 }
                 else if (Regex.IsMatch(line, @"^posts small blind"))
                 {
-                    _actions.Add(new PostSmallBlind(actingPlayer, _actions.Last().CurrentGameState, Convert.ToDouble(amt)));                        
+                    if (_actions.Count == 0)
+                    {
+                        _actions.Add(new PostSmallBlind(actingPlayer, new GameState( Street.PreFlop, 0, 0), Convert.ToDouble(amt)));
+                    }
+                    else
+                    {
+                        _actions.Add(new PostSmallBlind(actingPlayer, _actions.Last().CurrentGameState, Convert.ToDouble(amt)));                        
+                    }                    
                 }
                 else if (Regex.IsMatch(line, @"^posts big blind"))
                 {
@@ -197,13 +204,19 @@ namespace PokerLib2
                     else if (prevAct is Bet || prevAct is Raise || prevAct is Call)
                     {//This must have been a raise or a call
                         BettingAction prevBet = (BettingAction)prevAct;
-                        if (prevBet.Amount < amt)
-                        {//We are raising all-in
+
+                        double amtToCall = TotalBet(prevBet.Player, prevBet.CurrentGameState.CurStreet, prevBet) - TotalBet(actingPlayer, _actions.Last().CurrentGameState.CurStreet, _actions.Last());
+                        if (amtToCall < amt)
+                        {//We must have raised all-in
                             _actions.Add(new Raise(actingPlayer, _actions.Last().CurrentGameState, amt, true));
                         }
-                        else
+                        else if (amtToCall >= amt)
                         {//We must have gone all-in while calling
                             _actions.Add(new Call(actingPlayer, _actions.Last().CurrentGameState, amt, true));
+                        }
+                        else
+                        {
+                            throw new ArgumentException("Unable to determine context of the all-in.");
                         }
                     }
                     else if (prevAct is PostSmallBlind)
@@ -279,7 +292,7 @@ namespace PokerLib2
                 int sidePot = 0;
                 if(Regex.IsMatch(line, "from the side pot"))
                 {
-                    sidePot = Convert.ToInt32(Regex.Match(line,@"(?<=side pot )\d(?= )"));
+                    sidePot = Convert.ToInt32(Regex.Match(line,@"(?<=side pot )\d(?= )").Value);
                 }
 
                 _actions.Add(new AwardPot(winningPlayer, _actions.Last().CurrentGameState, potSize, sidePot));
@@ -329,6 +342,53 @@ namespace PokerLib2
             {
                 throw new ArgumentException("Only 1 or 0 actions can be added per line:" + line);
             }
+        }
+
+        public double TotalBet(PlayerInfo player, Street startingStreet, Action endingAction)
+        {
+            double result = 0;
+            bool startAdding = false;
+            int endingIndex = GetActionIndex(endingAction);
+            for (int i = 0; i <= endingIndex; i++)
+            {
+                if (i > _actions.Count - 1)
+                {
+                    throw new ArgumentException("Invalid hand history: Unable to find ending action.");
+                }
+                if (startAdding == false)
+                {
+                    startAdding = (startingStreet == _actions[i].CurrentGameState.CurStreet);
+                }
+
+                if (startAdding)
+                {                                                           
+                    if (_actions[i] is BettingAction )
+                    {
+                        BettingAction bet = (BettingAction)_actions[i];
+                        if (bet.Player.Name == player.Name)
+                        {
+                            result += bet.Amount;
+                        }
+                    }
+                }
+
+            }
+
+            return result;
+        }
+
+        public int GetActionIndex(Action action)
+        {
+            int retActionIndex = 0;
+            foreach( Action act in _actions){
+                if (act == action)
+                {
+                    return retActionIndex;
+                }
+                retActionIndex++;
+            }
+
+            return -1;
         }
     }//class Hand
 
