@@ -12,8 +12,8 @@ namespace PokerLib2
         protected PlayerInfo _player;
         public PlayerInfo Player { get { return _player; } }
         
-        protected PlayerAction(PlayerInfo player, GameState gameState)
-            : base(gameState)
+        protected PlayerAction(PlayerInfo player, Street street)
+            : base(street)
         {
             _player = player;            
         }
@@ -30,37 +30,37 @@ namespace PokerLib2
         public bool All_In { get { return _all_In; } }
 
         //public BettingAction(PlayerInfo Player, PlayerBettingActions Act, double Amount = 0, bool All_In = false):base(Player)
-        public BettingAction(PlayerInfo player, GameState prevGameState, double amount, bool All_In = false)
-            : base(player, prevGameState)
+        public BettingAction(PlayerInfo player, Street street, double amount, bool All_In = false)
+            : base(player, street)
         {
             //_Act = Act;
             _amount = amount;
             _all_In = All_In;
-            _curGameState.PotSize += amount;
+            //_curGameState.PotSize += amount;
         }
     }
 
     class Fold : BettingAction
     {
-        public Fold(PlayerInfo player, GameState prevGameState)
-            : base(player, prevGameState, 0)
+        public Fold(PlayerInfo player, Street street)
+            : base(player, street, 0)
         {            
-            _curGameState.ActivePlayers -= 1;
+            //_curGameState.ActivePlayers -= 1;
         }
     }
 
     class Check : BettingAction
     {
-        public Check(PlayerInfo player, GameState prevGameState) 
-            : base(player, prevGameState, 0) 
+        public Check(PlayerInfo player, Street street) 
+            : base(player, street, 0) 
         {            
         }
     }
 
     class Raise : BettingAction
     {
-        public Raise(PlayerInfo player, GameState prevGameState, double amount, bool all_in = false)
-            : base(player, prevGameState, amount, all_in) 
+        public Raise(PlayerInfo player, Street street, double amount, bool all_in = false)
+            : base(player, street, amount, all_in) 
         {
             
         }
@@ -68,8 +68,8 @@ namespace PokerLib2
 
     class Bet : BettingAction
     {
-        public Bet(PlayerInfo player, GameState prevGameState, double amount, bool all_in = false)
-            : base(player, prevGameState, amount, all_in) 
+        public Bet(PlayerInfo player, Street street, double amount, bool all_in = false)
+            : base(player, street, amount, all_in) 
         {
             
         }
@@ -77,8 +77,8 @@ namespace PokerLib2
 
     class @Call : BettingAction
     {
-        public Call(PlayerInfo player, GameState prevGameState, double amount, bool all_in = false) 
-            : base(player, prevGameState, amount, all_in) 
+        public Call(PlayerInfo player, Street street, double amount, bool all_in = false) 
+            : base(player, street, amount, all_in) 
         {
                   
         }
@@ -86,21 +86,21 @@ namespace PokerLib2
 
     class PostSmallBlind : BettingAction
     {
-        public PostSmallBlind(PlayerInfo player, GameState prevGameState, double amount, bool all_in = false) 
-            : base(player, prevGameState, amount, all_in) 
+        public PostSmallBlind(PlayerInfo player, Street street, double amount, bool all_in = false) 
+            : base(player, street, amount, all_in) 
         {
             player.IsSmallBlind = true;
-            _curGameState.ActivePlayers += 1;
+            //_curGameState.ActivePlayers += 1;
         }
     }
 
     class PostBigBlind : BettingAction
     {
-        public PostBigBlind(PlayerInfo player, GameState prevGameState, double amount, bool all_in = false) 
-            : base(player, prevGameState, amount, all_in) 
+        public PostBigBlind(PlayerInfo player, Street street, double amount, bool all_in = false) 
+            : base(player, street, amount, all_in) 
         {
             player.IsBigBlind = true;
-            _curGameState.ActivePlayers += 1;
+            //_curGameState.ActivePlayers += 1;
         }
     }
 
@@ -116,8 +116,8 @@ namespace PokerLib2
         public bool Voluntary { get { return _voluntary; } }
         public bool FaceUp { get { return _faceUp; } }
 
-        public ShowsDownHand(PlayerInfo player, GameState prevGameState, Card card1, Card card2, bool faceUp, bool voluntary = false) 
-            : base(player, prevGameState)
+        public ShowsDownHand(PlayerInfo player, Street street, Card card1, Card card2, bool faceUp, bool voluntary = false) 
+            : base(player, street)
         {
             _card1 = card1;
             _card2 = card2;
@@ -128,25 +128,84 @@ namespace PokerLib2
 
     class MuckHand : PlayerAction
     {
-        public MuckHand(PlayerInfo player, GameState prevGameState)
-            : base(player, prevGameState)
+        public MuckHand(PlayerInfo player, Street street)
+            : base(player, street)
         {            
         }
     }
 
     class UseTimeBank : PlayerAction
     {
-        public UseTimeBank(PlayerInfo player, GameState prevGameState)
-            : base(player, prevGameState)
+        public UseTimeBank(PlayerInfo player, Street street)
+            : base(player, street)
         {
         }
     }
 
     class TimeOut : PlayerAction
     {
-        public TimeOut(PlayerInfo player, GameState prevGameState)
-            : base(player, prevGameState)
+        public TimeOut(PlayerInfo player, Street street)
+            : base(player, street)
         {
         }
     }
+
+    class DisconnectionTimeOut : TimeOut
+    {
+        public DisconnectionTimeOut( PlayerInfo player, Street street)
+            :base(player, street)
+        {
+
+        }
+    }
+    
+    class Chat : PlayerAction
+    {
+        private string _message;
+        public string Message { get { return _message; } }
+
+        public Chat( PlayerInfo player, Street street, string message )
+            : base(player, street)
+        {
+            _message = message;
+        }
+    }
+
+    class Disconnected : PlayerAction
+    {
+        private int _secondsRemaining;
+        public int SecondsRemaining { get { return _secondsRemaining; } }
+
+        public Disconnected(PlayerInfo player, Street street, int secondsRemaining)
+            : base(player, street)
+        {
+            _secondsRemaining = secondsRemaining;
+        }
+
+    }
+
+    class Reconnected : PlayerAction
+    {
+        private int _secondsToAct;
+        public int SecondsToAct { get { return _secondsToAct; } }
+
+        public Reconnected(PlayerInfo player, Street street, int secondsToAct)
+            : base(player, street)
+        {
+            _secondsToAct = secondsToAct;
+        }
+
+    }
+
+    class LeaveTable : PlayerAction
+    {
+        public LeaveTable( PlayerInfo player, Street street)
+            : base(player, street)
+        {
+
+        }
+    }
+
+
+
 }

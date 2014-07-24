@@ -8,13 +8,19 @@ namespace PokerLib2
 {
     public abstract class Action
     {
-        protected GameState _curGameState;
-        public GameState CurrentGameState { get { return _curGameState; } }
+        //protected GameState _curGameState;
+        //public GameState CurrentGameState { get { return _curGameState; } }
+        
+        protected Street _street;
+        public Street Street { get { return _street; } }
 
-        public Action(GameState gameState)
+        //public Action(GameState gameState)
+        public Action(Street street)
         {
-            _curGameState = gameState.DeepClone();
+            _street = street;
+            //_curGameState = gameState.DeepClone();
         }
+
     }
 
 }

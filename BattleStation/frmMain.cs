@@ -44,9 +44,11 @@ namespace BattleStation
                 "SELECT " +
                 "history " +
                 "FROM " +
-                "cash_hand_histories, cash_hand_player_statistics " +
+                "cash_hand_histories, cash_hand_player_statistics, holdem_hand_summary " +
                 "WHERE " +
-                "cash_hand_histories.id_hand = cash_hand_player_statistics.id_hand AND " + 
+                "cash_hand_histories.id_hand = cash_hand_player_statistics.id_hand AND " +
+                "cash_hand_histories.id_hand = holdem_hand_summary.id_hand AND " +
+                "holdem_hand_summary.cnt_players <= 2 AND " +
                 "cash_hand_player_statistics.id_player = 2 AND " + 
                 "cash_hand_player_statistics.date_played >= '2014/07/05 04:00:00'";
 
@@ -127,8 +129,13 @@ namespace BattleStation
                 "SELECT " +
                 "history " +
                 "FROM " +
-                "cash_hand_histories " +
+                "cash_hand_histories, cash_hand_summary " +
+                "WHERE cash_hand_histories.id_hand = cash_hand_summary.id_hand AND " +
+                "cash_hand_summary.cnt_players <= 2 " +
                 "LIMIT " + limit;
+
+
+
 
             //Load the hands
             NpgsqlDataAdapter da = new NpgsqlDataAdapter(sql, conn);

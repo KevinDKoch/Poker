@@ -8,8 +8,8 @@ namespace PokerLib2
 {    
     public abstract class DealerAction : Action
     {        
-        protected DealerAction( GameState prevGameState)
-            : base(prevGameState)
+        protected DealerAction( Street street)
+            : base(street)
         {
         }
     }
@@ -19,8 +19,8 @@ namespace PokerLib2
         protected List<Card> _cards;
         public List<Card> Cards { get { return _cards; } }
 
-        public Deal(GameState prevGameState)
-            : base(prevGameState)
+        public Deal(Street street)
+            : base(street)
         {
 
         }
@@ -31,18 +31,19 @@ namespace PokerLib2
         protected PlayerInfo _player;
         public PlayerInfo Player { get { return _player; } }
 
-        public DealHoleCards(Card card1, Card card2, PlayerInfo player, GameState prevGameState)
-            : base(prevGameState)
+        public DealHoleCards(Card card1, Card card2, PlayerInfo player)
+            : base(Street.PreFlop)
         {
             _cards = new List<Card> { card1, card2 };
             _player = player;
         }
+
     }
 
     class DealFlop : Deal
     {
-        public DealFlop(Card card1, Card card2, Card card3, GameState prevGameState)            
-            : base(prevGameState)
+        public DealFlop(Card card1, Card card2, Card card3)            
+            : base(Street.Flop)
         {
             _cards = new List<Card> { card1, card2, card3 };
         }
@@ -50,8 +51,8 @@ namespace PokerLib2
 
     class DealTurn : Deal
     {
-        public DealTurn(Card card1, GameState prevGameState)
-            : base(prevGameState)
+        public DealTurn(Card card1)
+            : base(Street.Turn)
         {
             _cards = new List<Card> { card1};
         }
@@ -59,8 +60,8 @@ namespace PokerLib2
 
     class DealRiver : Deal
     {
-        public DealRiver(Card card1, GameState prevGameState)
-            : base(prevGameState)
+        public DealRiver(Card card1)
+            : base(Street.River)
         {
             _cards = new List<Card> { card1 };
         }
@@ -76,8 +77,8 @@ namespace PokerLib2
         public double Pot { get { return _pot; } }
         public int SidePot { get { return _sidePot; } }
 
-        public AwardPot(PlayerInfo player, GameState prevGameState, double pot, int sidePot = 0 )
-            : base(prevGameState)
+        public AwardPot(PlayerInfo player, double pot, int sidePot = 0 )
+            : base(Street.River)
         {
             _player = player;
             _pot = pot;
@@ -90,8 +91,8 @@ namespace PokerLib2
         private long _nextGameNum;
         public long NextGameNum { get { return _nextGameNum; } }
 
-        public StartsNextHand(long nextGameNum, GameState prevGameState)
-            : base(prevGameState)
+        public StartsNextHand(long nextGameNum)
+            : base(Street.None)
         {
             _nextGameNum = nextGameNum;
         }
@@ -102,13 +103,20 @@ namespace PokerLib2
         private int _secondsUntilActivation;
         public int SecondsUntilActivation { get { return _secondsUntilActivation; } }
 
-        public TimeBankActivationWarning( int secondsUntilActivation, GameState prevGameState) 
-            : base (prevGameState)
+        public TimeBankActivationWarning( int secondsUntilActivation, Street street) 
+            : base (street)
         {
             _secondsUntilActivation = secondsUntilActivation;
         }
 
+    }
 
+    public class TimeBankEmptyNotification : DealerAction
+    {
+        public TimeBankEmptyNotification(Street street)
+            : base(street)
+        {
+        }
     }
 
 }
