@@ -28,25 +28,18 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.btnStart = new System.Windows.Forms.Button();
+            this.components = new System.ComponentModel.Container();
             this.pTable = new System.Windows.Forms.Panel();
             this.dgvSQLResults = new System.Windows.Forms.DataGridView();
-            this.btnTestParse = new System.Windows.Forms.Button();
             this.btnBatchParse = new System.Windows.Forms.Button();
             this.txtParseCount = new System.Windows.Forms.TextBox();
+            this.btnGenerateHandHistories = new System.Windows.Forms.Button();
+            this.txtHandGenerationAmount = new System.Windows.Forms.TextBox();
+            this.txtGenerationPace = new System.Windows.Forms.TextBox();
+            this.timerGenerateHands = new System.Windows.Forms.Timer(this.components);
             this.pTable.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSQLResults)).BeginInit();
             this.SuspendLayout();
-            // 
-            // btnStart
-            // 
-            this.btnStart.Location = new System.Drawing.Point(12, 12);
-            this.btnStart.Name = "btnStart";
-            this.btnStart.Size = new System.Drawing.Size(124, 78);
-            this.btnStart.TabIndex = 0;
-            this.btnStart.Text = "Run";
-            this.btnStart.UseVisualStyleBackColor = true;
-            this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
             // 
             // pTable
             // 
@@ -66,19 +59,9 @@
             this.dgvSQLResults.Size = new System.Drawing.Size(606, 267);
             this.dgvSQLResults.TabIndex = 0;
             // 
-            // btnTestParse
-            // 
-            this.btnTestParse.Location = new System.Drawing.Point(152, 12);
-            this.btnTestParse.Name = "btnTestParse";
-            this.btnTestParse.Size = new System.Drawing.Size(75, 23);
-            this.btnTestParse.TabIndex = 2;
-            this.btnTestParse.Text = "Parse";
-            this.btnTestParse.UseVisualStyleBackColor = true;
-            this.btnTestParse.Click += new System.EventHandler(this.btnTestParse_Click);
-            // 
             // btnBatchParse
             // 
-            this.btnBatchParse.Location = new System.Drawing.Point(233, 47);
+            this.btnBatchParse.Location = new System.Drawing.Point(93, 7);
             this.btnBatchParse.Name = "btnBatchParse";
             this.btnBatchParse.Size = new System.Drawing.Size(75, 24);
             this.btnBatchParse.TabIndex = 3;
@@ -88,22 +71,53 @@
             // 
             // txtParseCount
             // 
-            this.txtParseCount.Location = new System.Drawing.Point(152, 50);
+            this.txtParseCount.Location = new System.Drawing.Point(12, 10);
             this.txtParseCount.Name = "txtParseCount";
             this.txtParseCount.Size = new System.Drawing.Size(75, 20);
             this.txtParseCount.TabIndex = 4;
             this.txtParseCount.Text = "1000";
+            // 
+            // btnGenerateHandHistories
+            // 
+            this.btnGenerateHandHistories.Location = new System.Drawing.Point(122, 37);
+            this.btnGenerateHandHistories.Name = "btnGenerateHandHistories";
+            this.btnGenerateHandHistories.Size = new System.Drawing.Size(77, 25);
+            this.btnGenerateHandHistories.TabIndex = 5;
+            this.btnGenerateHandHistories.Text = "Generate";
+            this.btnGenerateHandHistories.UseVisualStyleBackColor = true;
+            this.btnGenerateHandHistories.Click += new System.EventHandler(this.btnGenerateHandHistories_Click);
+            // 
+            // txtHandGenerationAmount
+            // 
+            this.txtHandGenerationAmount.Location = new System.Drawing.Point(12, 40);
+            this.txtHandGenerationAmount.Name = "txtHandGenerationAmount";
+            this.txtHandGenerationAmount.Size = new System.Drawing.Size(75, 20);
+            this.txtHandGenerationAmount.TabIndex = 6;
+            this.txtHandGenerationAmount.Text = "100";
+            // 
+            // txtGenerationPace
+            // 
+            this.txtGenerationPace.Location = new System.Drawing.Point(93, 40);
+            this.txtGenerationPace.Name = "txtGenerationPace";
+            this.txtGenerationPace.Size = new System.Drawing.Size(23, 20);
+            this.txtGenerationPace.TabIndex = 7;
+            this.txtGenerationPace.Text = "10";
+            // 
+            // timerGenerateHands
+            // 
+            this.timerGenerateHands.Tick += new System.EventHandler(this.timerGenerateHands_Tick);
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(606, 409);
+            this.Controls.Add(this.txtGenerationPace);
+            this.Controls.Add(this.txtHandGenerationAmount);
+            this.Controls.Add(this.btnGenerateHandHistories);
             this.Controls.Add(this.txtParseCount);
             this.Controls.Add(this.btnBatchParse);
-            this.Controls.Add(this.btnTestParse);
             this.Controls.Add(this.pTable);
-            this.Controls.Add(this.btnStart);
             this.Name = "frmMain";
             this.Text = "Battle Station";
             this.pTable.ResumeLayout(false);
@@ -115,12 +129,14 @@
 
         #endregion
 
-        private System.Windows.Forms.Button btnStart;
         private System.Windows.Forms.Panel pTable;
         private System.Windows.Forms.DataGridView dgvSQLResults;
-        private System.Windows.Forms.Button btnTestParse;
         private System.Windows.Forms.Button btnBatchParse;
         private System.Windows.Forms.TextBox txtParseCount;
+        private System.Windows.Forms.Button btnGenerateHandHistories;
+        private System.Windows.Forms.TextBox txtHandGenerationAmount;
+        private System.Windows.Forms.TextBox txtGenerationPace;
+        private System.Windows.Forms.Timer timerGenerateHands;
     }
 }
 

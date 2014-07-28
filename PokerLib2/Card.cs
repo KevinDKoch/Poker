@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PokerLib2
 {
-    public enum Rank { Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King, Ace }
+    public enum Rank { Two = 2, Three = 3, Four = 4, Five = 5, Six = 6, Seven = 7, Eight = 8, Nine = 9, Ten = 10, Jack = 11, Queen = 12, King = 13, Ace = 14 }
     public enum Suit { Clubs, Diamonds, Hearts, Spades }
 
     public class Card
@@ -25,16 +25,99 @@ namespace PokerLib2
 
         public Card(string card)
         {
-            Deck deck = new Deck();
-            foreach (Card c in deck.Cards)
+
+            if(card.Length != 2) throw new ArgumentException("Unknown Card:" + card);
+
+            switch (card[0])
             {
-                if (card == c.ToString())
-                {
-                    _rank = c.Rank;
-                    _suit = c.Suit;
+                case '2':
+                    _rank = Rank.Two;
                     break;
-                }
+                case '3':
+                    _rank = Rank.Three;
+                    break;
+                case '4':
+                    _rank = Rank.Four;
+                    break;
+                case '5':
+                    _rank = Rank.Five;
+                    break;
+                case '6':
+                    _rank = Rank.Six;
+                    break;
+                case '7':
+                    _rank = Rank.Seven;
+                    break;
+                case '8':
+                    _rank = Rank.Eight;
+                    break;
+                case '9':
+                    _rank = Rank.Nine;
+                    break;
+                case 'T':
+                    _rank = Rank.Ten;
+                    break;
+                case 'J':
+                    _rank = Rank.Jack;
+                    break;
+                case 'Q':
+                    _rank = Rank.Queen;
+                    break;
+                case 'K':
+                    _rank = Rank.King;
+                    break;
+                case 'A':
+                    _rank = Rank.Ace;
+                    break;
+                default:
+                    throw new ArgumentException("Unknown Rank:" + card);
             }
+
+            switch (card[1])
+            {
+                case 'c':
+                    _suit = Suit.Clubs;
+                    break;
+                case 'd':
+                    _suit = Suit.Diamonds;
+                    break;
+                case 'h':
+                    _suit = Suit.Hearts;
+                    break;
+                case 's':
+                    _suit = Suit.Spades;
+                    break;
+                default:
+                    throw new ArgumentException("Unknown Suit:" + card);
+            }
+
+        }
+
+        public override bool Equals(object obj)
+        {
+            Card card = obj as Card;
+            if (obj == null)
+            {
+                return false;
+            }            
+            return (card.Rank == _rank && card.Suit == _suit);            
+        }
+
+        public bool Equals(Card card)
+        {
+            if (card == null)
+            {
+                return false;
+            }
+            return (card.Rank == _rank && card.Suit == _suit);
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = 13;
+            hash += (int)_rank;
+            hash += (int)_suit;
+            return hash;
         }
 
         public override string ToString()
@@ -83,7 +166,7 @@ namespace PokerLib2
                     break;
                 default:
                     throw new Exception("Unknown Card Rank.");
-            }
+            }//switch(_rank)
 
             switch (_suit)
             {
@@ -101,8 +184,7 @@ namespace PokerLib2
                     break;
                 default:
                     throw new Exception("Unknown Card Suit.");
-
-            }
+            }//switch(_suit)
 
             return name;
         }
