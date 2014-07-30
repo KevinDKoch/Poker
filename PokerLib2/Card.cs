@@ -7,22 +7,41 @@ using System.Threading.Tasks;
 namespace PokerLib2
 {
     public enum Rank { Two = 2, Three = 3, Four = 4, Five = 5, Six = 6, Seven = 7, Eight = 8, Nine = 9, Ten = 10, Jack = 11, Queen = 12, King = 13, Ace = 14 }
-    public enum Suit { Clubs, Diamonds, Hearts, Spades }
+    public enum Suit { Clubs = 1, Diamonds = 2, Hearts = 3, Spades = 4 }
 
     public class Card
     {
-        protected Rank _rank;
-        protected Suit _suit;
+        protected readonly Rank _rank;
+        protected readonly Suit _suit;
 
         public Rank Rank { get { return _rank; } }
         public Suit Suit { get { return _suit; } }
 
+        /// <summary>
+        /// Represents a playing card.
+        /// </summary>
+        /// <param name="rank">The rank of the card.</param>
+        /// <param name="suit">The suit of the card.</param>
         public Card(Rank rank, Suit suit)
         {
+            if (Enum.IsDefined(typeof(Rank), rank) == false) 
+            { 
+                throw new ArgumentOutOfRangeException("Unknown Rank:" + rank); 
+            }
+
+            if (Enum.IsDefined(typeof(Suit), suit) == false)
+            {
+                throw new ArgumentOutOfRangeException("Unknown Suit:" + suit);
+            }
+
             _rank = rank;
             _suit = suit;
         }
 
+        /// <summary>
+        /// Represents a playing card.
+        /// </summary>
+        /// <param name="card">A two letter representation of a card.  The capitolized first letter represents the rank, followed by a lowercase letter representing the suit.</param>
         public Card(string card)
         {
 
@@ -100,7 +119,7 @@ namespace PokerLib2
             {
                 return false;
             }            
-            return (card.Rank == _rank && card.Suit == _suit);            
+            return Equals(card);            
         }
 
         public bool Equals(Card card)
@@ -113,11 +132,8 @@ namespace PokerLib2
         }
 
         public override int GetHashCode()
-        {
-            int hash = 13;
-            hash += (int)_rank;
-            hash += (int)_suit;
-            return hash;
+        {           
+            return _rank.GetHashCode() * 17 ^ _suit.GetHashCode() * 23;
         }
 
         public override string ToString()

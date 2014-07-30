@@ -10,22 +10,22 @@ namespace PokerLib2
     {
         public enum Currency {Play, USD, CAD, EUR, GBP};
         
-        private float _SmallBlind;
-        private float _BigBlind;
-        private float _Ante;
-        private Currency _Cur;
+        private readonly float _smallBlind;
+        private readonly float _bigBlind;
+        private readonly float _ante;
+        private readonly Currency _cur;
 
-        public float SmallBlind { get {return _SmallBlind; } }
-        public float BigBlind { get { return _BigBlind; } }
-        public float Ante { get { return _Ante; } }
-        public Currency Cur { get { return _Cur; } }
+        public float SmallBlind { get {return _smallBlind; } }
+        public float BigBlind { get { return _bigBlind; } }
+        public float Ante { get { return _ante; } }
+        public Currency Cur { get { return _cur; } }
 
-        public Stakes(float SmallBlind, float BigBlind, float Ante = 0, Currency Cur = Stakes.Currency.USD)
+        public Stakes(float smallBlind, float bigBlind, float ante = 0, Currency cur = Stakes.Currency.USD)
         {
-            _SmallBlind = SmallBlind;
-            _BigBlind = BigBlind;
-            _Ante = Ante;
-            _Cur = Cur;
+            _smallBlind = smallBlind;
+            _bigBlind = bigBlind;
+            _ante = ante;
+            _cur = cur;
         }
     }
 }
