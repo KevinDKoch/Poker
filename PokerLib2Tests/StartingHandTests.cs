@@ -48,7 +48,7 @@ namespace PokerLib2Tests
         }
 
         [TestMethod]
-        public void ToString_Creates_Valid_StartingHand_via_string_constructor_for_all_Perms()
+        public void ToString_Matches_Expected_Regex()
         {
             Regex startingHandLongName = new Regex(@"^[2-9,A,K,Q,J,T][c,d,h,s][2-9,A,K,Q,J,T][c,d,h,s]$");
             Regex startingHandShortName = new Regex(@"^([2-9,A,K,Q,J,T][2-9,A,K,Q,J,T][o,s]$)|([22,33,44,55,66,77,88,99,TT,JJ,QQ,KK,AA]$)");
@@ -59,17 +59,19 @@ namespace PokerLib2Tests
                 Assert.IsTrue(startingHandLongName.IsMatch(hand.ToString(false)), "Incorrect Hand Long Format found in Combos:" + hand.ToString(false));
                 Assert.IsTrue(startingHandShortName.IsMatch(hand.ToString(true)), "Incorrect Hand Short Format found in Combos:" + hand.ToString(true));
 
-                //Verify order in simple format
-                if(hand.SecondCard.Rank >= hand.FirstCard.Rank)
+                //Verify order in short format
+                if(hand.SecondCard.Rank > hand.FirstCard.Rank)
                 {
                     StartingHand orderedHand = new StartingHand(hand.SecondCard, hand.FirstCard);
 
                     //First card should be bigger then the second
                     Assert.IsTrue(hand.ToString(true).Substring(0, 1) == orderedHand.FirstCard.ToString().Substring(0, 1));
-                    //Either order should output the same when using the simple format
+                    //Either order should output the same when using the short format
                     Assert.IsTrue(hand.ToString(true) == orderedHand.ToString(true));
                     //Order should be different with the long format
                     Assert.IsTrue(hand.ToString(false) != orderedHand.ToString());
+
+                    Assert.IsTrue(hand.ToString(false, true) == orderedHand.ToString(),"The sorted long format did not match:" + hand.ToString(false, true) + " != " + hand.ToString());                    
                 }                
             }
 
@@ -159,6 +161,16 @@ namespace PokerLib2Tests
             Assert.IsFalse(new StartingHand(new Card("As"), new Card("Ks")).Equals(null));
             Assert.IsFalse(new StartingHand(new Card("As"), new Card("Ks")).Equals(new Card("As")));
             Assert.IsFalse(new StartingHand(new Card("As"), new Card("Ks")).Equals(new StartingHand(new Card("As"), new Card("Ks")),(StartingHand.MatchingMode)9));
+        }
+
+        [TestMethod]
+        public void ToStringCreatesValidStartingHands()
+        {
+            foreach (StartingHand hand in _startingHandPermutations.Values)
+            {
+                StartingHand handFromString = new StartingHand(hand.ToString());
+                Assert.IsTrue(hand.Equals(handFromString, StartingHand.MatchingMode.ExactSuits, true), "The hand created from ToString was not an exact match");
+            }
         }
     }
 }
