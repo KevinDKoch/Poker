@@ -53,8 +53,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PokerSite.cs" />
     <Compile Include="Range.cs" />
+    <Compile Include="Rank.cs" />
     <Compile Include="Stakes.cs" />
     <Compile Include="StartingHand.cs" />
+    <Compile Include="Suit.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -49,12 +49,37 @@ namespace PokerLib2Tests
             range = new Range("{**(.5)}");
             Assert.IsTrue(range.Combos() == 1326 * .5);
 
+            range = new Range("{A5s-A2s}");
+            Assert.IsTrue(range.Combos() == 4 * 4);
+
+            range = new Range("{A5s-2As}");
+            Assert.IsTrue(range.Combos() == 4 * 4);
+
+            range = new Range("{22-AA}");
+            Assert.IsTrue(range.Combos() == 6 * 13);
+
+            range = new Range("{77-33}");
+            Assert.IsTrue(range.Combos() == 6 * 5);
+
+            range = new Range("{22-33}");
+            Assert.IsTrue(range.Combos() == 6 * 2);
+
+            range = new Range("{TT-AA(.5)}");
+            Assert.IsTrue(range.Combos() == 5 * 6 * .5);
+
+            range = new Range("{AKo-A3o(.75)}");
+            Assert.IsTrue(range.Combos() == 12 * 11 * .75 );
+
+            range = new Range("{JT-76(.75)}");
+            Assert.IsTrue(range.Combos() == 16 * 5 * .75);
+
+
 
         }
         [TestMethod]
         public void InValidRanges()
         {
-            
+
             Assert.IsTrue(Range.IsValidRange("{AKs-AQs}"));
             Assert.IsTrue(Range.IsValidRange("{JTo-76o}"));
             Assert.IsTrue(Range.IsValidRange("{76o-JTo}"));
@@ -71,6 +96,8 @@ namespace PokerLib2Tests
             Assert.IsFalse(Range.IsValidRange("{AK-22s}"));
             Assert.IsFalse(Range.IsValidRange("{AK-22s}"));
             
+
+
         }
 
     }

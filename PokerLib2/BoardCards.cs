@@ -20,7 +20,7 @@ namespace PokerLib2
         {
         }
 
-        public BoardCards(Card[] flop, Card Turn = null, Card river = null)
+        public BoardCards(Card[] flop, Card Turn , Card river )
         {
             if (flop == null)
             {
@@ -31,10 +31,10 @@ namespace PokerLib2
                 throw new ArgumentException("The flop must be 3 cards.");
             }
 
-            if (_turn == null & _river != null)
-            {
-                throw new ArgumentException("If there is a river, there must be a turn.");
-            }
+            //if (_turn == null & _river != null)
+            //{
+            //    throw new ArgumentException("If there is a river, there must be a turn.");
+            //}
 
             _flop = flop;
             _turn = Turn;
@@ -44,8 +44,10 @@ namespace PokerLib2
         public BoardCards DeepClone()
         {
             Card[] flop = {new Card(_flop[0].ToString()), new Card(_flop[1].ToString()), new Card(_flop[2].ToString())};
-            Card turn = (_turn == null)? null : new Card(_turn.ToString());
-            Card river = (_river == null)? null : new Card(_river.ToString());
+            //Card turn = (_turn == null)? null : new Card(_turn.ToString());
+            Card turn = new Card(_turn.ToString());
+            //Card river = (_river == null)? null : new Card(_river.ToString());
+            Card river = new Card(_river.ToString());
 
             return new BoardCards(flop, turn, river);
         }

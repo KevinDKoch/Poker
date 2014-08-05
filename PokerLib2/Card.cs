@@ -6,14 +6,13 @@ using System.Threading.Tasks;
 
 namespace PokerLib2
 {
-
-    public class Card
+    public struct Card
     {
-        protected readonly Rank _rank;
-        protected readonly Suit _suit;
+        private readonly Rank rank;
+        private readonly Suit suit;
 
-        public Rank Rank { get { return _rank; } }
-        public Suit Suit { get { return _suit; } }
+        public Rank Rank { get { return this.rank; } }
+        public Suit Suit { get { return this.suit; } }
 
         /// <summary>
         /// Represents a playing card.
@@ -32,11 +31,9 @@ namespace PokerLib2
                 throw new ArgumentOutOfRangeException("Unknown Suit:" + suit);
             }
 
-            _rank = rank;
-            _suit = suit;
+            this.rank = rank;
+            this.suit = suit;
         }
-
-        //TODO: RankToString?
 
         /// <summary>
         /// Represents a playing card.
@@ -44,164 +41,33 @@ namespace PokerLib2
         /// <param name="card">A two letter representation of a card.  The capitolized first letter represents the rank, followed by a lowercase letter representing the suit.</param>
         public Card(string card)
         {
-
-            if(card.Length != 2) throw new ArgumentException("Unknown Card:" + card);
-
-            switch (card[0])
-            {
-                case '2':
-                    _rank = Rank.Two;
-                    break;
-                case '3':
-                    _rank = Rank.Three;
-                    break;
-                case '4':
-                    _rank = Rank.Four;
-                    break;
-                case '5':
-                    _rank = Rank.Five;
-                    break;
-                case '6':
-                    _rank = Rank.Six;
-                    break;
-                case '7':
-                    _rank = Rank.Seven;
-                    break;
-                case '8':
-                    _rank = Rank.Eight;
-                    break;
-                case '9':
-                    _rank = Rank.Nine;
-                    break;
-                case 'T':
-                    _rank = Rank.Ten;
-                    break;
-                case 'J':
-                    _rank = Rank.Jack;
-                    break;
-                case 'Q':
-                    _rank = Rank.Queen;
-                    break;
-                case 'K':
-                    _rank = Rank.King;
-                    break;
-                case 'A':
-                    _rank = Rank.Ace;
-                    break;
-                default:
-                    throw new ArgumentException("Unknown Rank:" + card);
-            }
-
-            switch (card[1])
-            {
-                case 'c':
-                    _suit = Suit.Clubs;
-                    break;
-                case 'd':
-                    _suit = Suit.Diamonds;
-                    break;
-                case 'h':
-                    _suit = Suit.Hearts;
-                    break;
-                case 's':
-                    _suit = Suit.Spades;
-                    break;
-                default:
-                    throw new ArgumentException("Unknown Suit:" + card);
-            }
-
+            if(card.Length != 2) throw new ArgumentException("Too many characters:" + card);
+            this.rank = card[0].ToRank();
+            this.suit = card[1].ToSuit();
         }
 
         public override bool Equals(object obj)
         {
-            Card card = obj as Card;
-            if (obj == null)
-            {
+            if (!(obj is Card))            
                 return false;
-            }            
-            return Equals(card);            
+
+            return Equals((Card)obj);
         }
 
         public bool Equals(Card card)
         {
-            if (card == null)
-            {
-                return false;
-            }
-            return (card.Rank == _rank && card.Suit == _suit);
+            return (card.Rank == this.rank && card.Suit == this.suit);
         }
 
         public override int GetHashCode()
         {           
-            return _rank.GetHashCode() * 17 ^ _suit.GetHashCode() * 23;
+            return this.rank.GetHashCode() * 17 ^ this.suit.GetHashCode() * 23;
         }
 
         public override string ToString()
         {
-            string name = "Unknown Rank";
-            switch (_rank)
-            {
-                case Rank.Two:
-                    name = "2";
-                    break;
-                case Rank.Three:
-                    name = "3";
-                    break;
-                case Rank.Four:
-                    name = "4";
-                    break;
-                case Rank.Five:
-                    name = "5";
-                    break;
-                case Rank.Six:
-                    name = "6";
-                    break;
-                case Rank.Seven:
-                    name = "7";
-                    break;
-                case Rank.Eight:
-                    name = "8";
-                    break;
-                case Rank.Nine:
-                    name = "9";
-                    break;
-                case Rank.Ten:
-                    name = "T";
-                    break;
-                case Rank.Jack:
-                    name = "J";
-                    break;
-                case Rank.Queen:
-                    name = "Q";
-                    break;
-                case Rank.King:
-                    name = "K";
-                    break;
-                case Rank.Ace:
-                    name = "A";
-                    break;
-                default:
-                    throw new Exception("Unknown Card Rank.");
-            }//switch(_rank)
-
-            switch (_suit)
-            {
-                case Suit.Clubs:
-                    name += "c";
-                    break;
-                case Suit.Diamonds:
-                    name += "d";
-                    break;
-                case Suit.Hearts:
-                    name += "h";
-                    break;
-                case Suit.Spades:
-                    name += "s";
-                    break;
-                default:
-                    throw new Exception("Unknown Card Suit.");
-            }//switch(_suit)
-
+            string name = this.rank.ToChar().ToString();
+            name += this.suit.ToChar().ToString();
             return name;
         }
     }
