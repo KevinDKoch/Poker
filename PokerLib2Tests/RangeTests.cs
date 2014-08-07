@@ -73,8 +73,30 @@ namespace PokerLib2Tests
             range = new Range("{JT-76(.75)}");
             Assert.IsTrue(range.Combos() == 16 * 5 * .75);
 
+            range = new Range("{TT+}");
+            Assert.IsTrue(range.Combos() == 6 * 5);
+
+            range = new Range("{TT-}");
+            Assert.IsTrue(range.Combos() == 6 * 9);
+
+            range = new Range("{76s+}");
+            Assert.IsTrue(range.Combos() == 4 * 8);
+
+            range = new Range("{76o+}");
+            Assert.IsTrue(range.Combos() == 12 * 8);
+
+            range = new Range("{76+}");
+            Assert.IsTrue(range.Combos() == 16 * 8);
+
+            this.TestRange("{76s,76o}", 16);
 
 
+        }
+
+        public void TestRange(string range, float expectedCombos)
+        {
+            Range testRange = new Range(range);
+            Assert.AreEqual(expectedCombos, testRange.Combos(), range);
         }
         [TestMethod]
         public void InValidRanges()

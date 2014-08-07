@@ -172,5 +172,14 @@ namespace PokerLib2Tests
                 Assert.IsTrue(hand.Equals(handFromString, StartingHand.MatchingMode.ExactSuits, true), "The hand created from ToString was not an exact match");
             }
         }
+
+        [TestMethod]
+        public void TestingEquals()
+        {
+            StartingHand hand = new StartingHand("AcKs");
+            hand.Equals(new StartingHand("AsKc"));
+        }
+
+
     }
 }

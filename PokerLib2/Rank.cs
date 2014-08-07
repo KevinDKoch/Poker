@@ -10,12 +10,12 @@ namespace PokerLib2
 
     public static class RankExtension
     {
-        public static char ToChar(this Rank rank)
+        public static string ToLetter(this Rank rank)
         {
             if (rank >= Rank.Two & rank <= Rank.Nine)
-                return ((int)rank).ToString()[0];
+                return ((int)rank).ToString()[0].ToString();
             else
-                return rank.ToString()[0];
+                return rank.ToString()[0].ToString();
         }
     }
 
@@ -23,7 +23,7 @@ namespace PokerLib2
     {
         public static Rank ToRank(this char rank)
         {
-            switch (rank.ToString().ToUpper())
+            switch (rank.ToString())
             {
                 case "2":
                     return Rank.Two;
@@ -58,7 +58,7 @@ namespace PokerLib2
 
         public static Suit ToSuit(this char suit)
         {
-            switch (suit.ToString().ToLower())
+            switch (suit.ToString())
             {
                 case "c":
                     return Suit.Clubs;

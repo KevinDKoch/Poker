@@ -32,7 +32,9 @@ namespace PokerLib2
             {
                 string hand = tok;
 
+                string suitedness = Regex.Match(hand, @"(?<=" + PokerRegex.rank + PokerRegex.rank + ")" + PokerRegex.suitedness).Value;
                 //Get and trim the weight
+                //TODO: Throw an exception if we attempt to add a hand already in the range that contains a different weight
                 float weight = 1;
                 if (Regex.IsMatch(tok, PokerRegex.weight + "$")) 
                 { 
@@ -44,22 +46,23 @@ namespace PokerLib2
                 {
                     _hands.Add(new WeightedStartingHand(hand));
                 }
-                else if ((Regex.IsMatch(hand,  PokerRegex.RangeGroups.handGroup )) ||
-                         (Regex.IsMatch(hand,  PokerRegex.RangeGroups.wildGroup )))
-                {   //AK,AKs,99                                        
-                    //A*, *A, **, A*s, *Ao, **s
+                else if ((Regex.IsMatch(hand, PokerRegex.RangeGroups.handGroup)) || //Ex: AK,AKs,99  
+                         (Regex.IsMatch(hand, PokerRegex.RangeGroups.wildGroup)))   //Ex: A*, *A, **, A*s, *Ao, **s
+                {                                                             
                     List<Rank> firstCardRanks = new List<Rank>();
-                    List<Rank> secondCardRanks = new List<Rank>();;
+                    List<Rank> secondCardRanks = new List<Rank>();
                     if (hand.StartsWith("*"))
                         firstCardRanks = Enum.GetValues(typeof(Rank)).Cast<Rank>().ToList();
                     else
                         firstCardRanks.Add(hand[0].ToRank());
 
+                    
                     if (hand[1] =='*')
                         secondCardRanks = Enum.GetValues(typeof(Rank)).Cast<Rank>().ToList();
                     else
                         secondCardRanks.Add(hand[1].ToRank());
 
+                    //Create all suit combinations for each allowed rank combination and filter for suitedness
                     foreach (Rank firstRank in firstCardRanks)
                     {
                         foreach (Rank secondRank in secondCardRanks)
@@ -74,10 +77,11 @@ namespace PokerLib2
                                     {
                                         WeightedStartingHand newHand = new WeightedStartingHand(first, second, weight);
                                         if (_hands.Contains(newHand) == false)
-                                        {
+                                        {                   
+                                            //Filter for suitedness
                                             if ((hand.EndsWith("s") && newHand.IsSuited()) ||
-                                               (hand.EndsWith("o") && !newHand.IsSuited() && newHand.FirstCard.Rank != newHand.SecondCard.Rank) ||
-                                               (!Regex.IsMatch(hand, PokerRegex.suitedness)))
+                                               (hand.EndsWith("o") && !newHand.IsSuited() && newHand.FirstCard.Rank != newHand.SecondCard.Rank) || //PP's are offsuit, but can't be written as 99o
+                                               (!Regex.IsMatch(hand, PokerRegex.suitedness))) //Groups that don't filter for suitedness
                                             {                                                
                                                 _hands.Add(newHand);
                                             }
@@ -89,12 +93,8 @@ namespace PokerLib2
                     }
                 }
                 else if (Regex.IsMatch(hand, PokerRegex.RangeGroups.closedLinear))
-                {
-                    
+                {                    
                     //Start with first hand group, then determine direction and iterate to the end hand group
-
-                    //StartingHand startHand = new StartingHand(Regex.Match(hand, @".*(?=-)").Value);
-                    //StartingHand endHand = new StartingHand(Regex.Match(hand, @"(?=>-).*").Value);
                     StartingHand startHand = new StartingHand(hand[0] + "c" + hand[1] + "s");
                     string endHandStr = Regex.Match(hand, @"(?<=-).*").Value;
                     StartingHand endHand = new StartingHand(endHandStr[0] + "c" + endHandStr[1] + "s");                    
@@ -113,43 +113,66 @@ namespace PokerLib2
                         startHand = temp;
                     }
                     
-                    //A5-A2
-                    //99-22
-                    //JT-76
-                    //A2-72
-                    string suitedness = (Regex.IsMatch(hand, PokerRegex.suitedness + "$")) ? hand[hand.Length - 1].ToString() : string.Empty;
+                    //Starting with the larger ranking hand, traverse to the ending hand.
+                    //Movement will be down, left-to-right, or diagonally down and right.
                     StartingHand curHand = startHand;
                     StartingHand prevHand = curHand;
-                    int horizontalStep = (startHand.LowCard.Rank == endHand.LowCard.Rank) ? 0 : -1;
                     int verticalStep = (startHand.HighCard.Rank == endHand.HighCard.Rank) ? 0 : -1;
+                    int horizontalStep = (startHand.LowCard.Rank == endHand.LowCard.Rank) ? 0 : -1;
                     do
                     {
-                        Range newHands = new Range(curHand.HighCard.Rank.ToChar().ToString() +
-                                                   curHand.LowCard.Rank.ToChar().ToString() +
+                        Range newHands = new Range(curHand.HighCard.Rank.ToLetter() +
+                                                   curHand.LowCard.Rank.ToLetter() +
                                                    suitedness + "(" + weight.ToString() + ")");
                         _hands.AddRange(newHands.Hands);
 
+                        //Get the next hand group
                         Rank nextHiRank = curHand.HighCard.Rank + verticalStep;
                         Rank nextLoRank = curHand.LowCard.Rank + horizontalStep;
                         prevHand = curHand;
+                        //Make sure the next hand is possible
                         if (Enum.IsDefined(typeof(Rank) , nextHiRank)==false || Enum.IsDefined(typeof(Rank), nextLoRank) == false) 
-                            break; //The next hand in this line does not exist
-                        curHand = new StartingHand(nextHiRank.ToChar() + "c" + nextLoRank.ToChar() + "s");
+                            break;
+                        curHand = new StartingHand(nextHiRank.ToLetter() + "c" + nextLoRank.ToLetter() + "s");
                     } while (prevHand.Equals(endHand) == false);
 
+                }//22+, 76+, JTs+, TT-, 76-, AKo-
+                else if (Regex.IsMatch(hand, PokerRegex.RangeGroups.openLinear))
+                {
+                    //Determine the end hand group and recursively call the range constuctor using the closedLinear format
+                    //Ex: TT+ == AA-TT
+                    StartingHand startHand = new StartingHand(hand[0] + "c" + hand[1] + "d");
+                    Range newHands = null;
+                    if (hand.EndsWith("+"))
+                    {
+                        //Ex: 77+
+                        if (startHand.IsPocketPair())
+                            newHands = new Range(hand[0].ToString() + hand[1].ToString() + "-" + "AA(" + weight + ")");
+                        else//Ex: 76s+
+                            newHands = new Range(hand[0].ToString() + hand[1].ToString() + suitedness + "-A" + ('A'.ToRank() - startHand.Gap()).ToLetter() + suitedness + "(" + weight + ")");
+
+                        _hands.AddRange(newHands.Hands);
+                    }
+                    else
+                    {
+                        //Ex: 77-
+                        if (startHand.IsPocketPair())
+                            newHands = new Range(hand[0].ToString() + hand[1].ToString() + "-" + "22(" + weight + ")");
+                        else//76s-
+                            newHands = new Range(hand[0] + hand[1] + suitedness + "-2" + ('2'.ToRank() + startHand.Gap()).ToLetter() + suitedness + "(" + weight + ")");
+
+                        _hands.AddRange(newHands.Hands);
+                    }                                       
                 }
             }
         }
 
-        //
-        protected List<WeightedStartingHand> BuildCombos(string handGroup)
-        {
-            List<WeightedStartingHand> combos = new List<WeightedStartingHand>();
-            
-
-            return combos;
-        }
-        
+        /// <summary>
+        /// Returns true if the range is valid.
+        /// </summary>
+        /// <param name="range">The string representation of a range.</param>
+        /// <param name="errorMsg">Contains any error message pertaining to invalid ranges.</param>
+        /// <returns>True if the range is valid.</returns>
         public static bool IsValidRange(string range, StringBuilder errorMsg = null)
         {            
             if(errorMsg == null) errorMsg = new StringBuilder();
@@ -171,7 +194,9 @@ namespace PokerLib2
                 //If the weight is invalid, then it will remain and the hand will fail to match anything
                 string hand = Regex.Replace(token, PokerRegex.weight + "$", string.Empty);
 
-                string errDuplicate = "Hand grouping matches multiple definitions.";
+                string errDuplicate = "Hand grouping matches multiple definitions:" + hand;
+                
+                //Ex: AcKs
                 if (Regex.IsMatch(hand, PokerRegex.RangeGroups.singleHand))
                 {
                     if (foundMatch)
@@ -183,6 +208,7 @@ namespace PokerLib2
                         foundMatch = true;                
                 }
 
+                //Ex: AK, AKs, AKo
                 if (Regex.IsMatch(hand, PokerRegex.RangeGroups.handGroup))
                 {
                     if (foundMatch)
@@ -194,6 +220,7 @@ namespace PokerLib2
                         foundMatch = true;
                 }
 
+                //Ex: *As, A*, **, **s
                 if (Regex.IsMatch(hand, PokerRegex.RangeGroups.wildGroup))
                 {
                     if (foundMatch)
@@ -205,6 +232,7 @@ namespace PokerLib2
                         foundMatch = true;
                 }
 
+                //Ex: 77+, 76s+, 54+, AKo-, TT-
                 if (Regex.IsMatch(hand, PokerRegex.RangeGroups.openLinear))
                 {
                     if (foundMatch)
@@ -216,15 +244,14 @@ namespace PokerLib2
                         foundMatch = true;
                 }
 
+                //Ex: AA-TT, JTs-76s, JT-AK
                 if (Regex.IsMatch(hand, PokerRegex.RangeGroups.closedLinear))
-                {
-                    
-                    //StartingHand startHand = new StartingHand(Regex.Match(hand, @".*(?=-)").Value);
+                {                    
                     StartingHand startHand = new StartingHand(hand[0] + "c" + hand[1] + "s");
-                    //StartingHand endHand = new StartingHand(Regex.Match(hand, @"(?=>-).*").Value);
                     string endHandStr = Regex.Match(hand, @"(?<=-).*").Value;
                     StartingHand endHand = new StartingHand(endHandStr[0] + "c" + endHandStr[1] + "s");
 
+                    //Do the hand groups make a line?
                     if ((startHand.HighCard.Rank == endHand.HighCard.Rank || startHand.LowCard.Rank == endHand.LowCard.Rank) || //Horizontal and Vertical
                         startHand.HighCard.Rank - endHand.HighCard.Rank == startHand.LowCard.Rank - endHand.LowCard.Rank)//Diagonal
                     {
@@ -241,9 +268,8 @@ namespace PokerLib2
                         errorMsg.Append("Hand grouping does not form a line:" + hand);
                         return false;
                     }
-
                 }
-
+                
                 if (foundMatch == false)
                 {
                     errorMsg.Append("Unknown hand group:" + hand);
@@ -254,6 +280,11 @@ namespace PokerLib2
             return foundMatch;           
         }
 
+        /// <summary>
+        /// Returns the combos after factoring the weight.
+        /// <para>AKs(.5) = 2 combos</para>
+        /// </summary>
+        /// <returns>The number of combinations after adjusting for weight.</returns>
         public float Combos()
         {
             float totalCombos = 0;
@@ -266,6 +297,7 @@ namespace PokerLib2
             return totalCombos;
         }
 
+        //TODO: ToString Short format for ranges
         public override string ToString()
         {
             string rangeStr = "{";
@@ -280,5 +312,11 @@ namespace PokerLib2
 
             return rangeStr;
         }
+
+        //TODO: Equals for ranges
+        //public override bool Equals(object obj)
+        //{            
+        //    return base.Equals(obj);
+        //}
     }
 }

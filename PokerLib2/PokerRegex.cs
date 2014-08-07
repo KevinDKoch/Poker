@@ -30,8 +30,7 @@ namespace PokerLib2
             public const string wildGroup = "^" + rank + @"\*" + suitedness + @"?$|^\*" + rank + suitedness + @"?$|^\*\*" + suitedness + "?$";
             
             public const string openLinear = @"^[2-9TJQKA][2-9TJQKA][\+\-]$|^([2-9TJQKA])(?!\1)[2-9TJQKA][os][\+\-]$";
-
-            //TODO: Consider removing 76-32 as a valid option, as it makes it harder to deal with two linear paths
+            
             public const string closedLinear = @"^[2-9TJQKA][2-9TJQKA]\-[2-9TJQKA][2-9TJQKA]$|^([2-9TJQKA])(?!\1)[2-9TJQKA]([os])\-[2-9TJQKA][2-9TJQKA](?=\2)[os]$";            
             
         }

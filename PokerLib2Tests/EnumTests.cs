@@ -11,7 +11,7 @@ namespace PokerLib2Tests
         [TestMethod]
         public void ToLetter_Tests()
         {
-            Assert.IsTrue(Suit.Diamonds.ToChar() == 'd');
+            Assert.IsTrue(Suit.Diamonds.ToLetter() == "d");
             Assert.IsTrue(Suit.Diamonds.ToString() == "Diamonds");
             Assert.IsTrue(Rank.Ten.ToString() == "Ten");
             //Assert.IsTrue(Rank.Eight.ToLetter() + Suit.Spades.ToSuit( == "8c");                        
@@ -21,11 +21,11 @@ namespace PokerLib2Tests
         public void StringToEnumTests()
         {
             Assert.IsTrue('s'.ToSuit() == Suit.Spades);
-            Assert.IsTrue('A'.ToRank().ToChar().ToString() + 's'.ToSuit().ToChar() == "As");
+            Assert.IsTrue('A'.ToRank().ToLetter() + 's'.ToSuit().ToLetter() == "As");
         }
 
         [TestMethod]
-        public void ToChar_ToSuit_ToRank_CreateTheSame52Cards()
+        public void ToLetter_ToSuit_ToRank_CreateTheSame52Cards()
         {
             List<Card> cards = new List<Card>();
             foreach (Rank r in (Rank[])Enum.GetValues(typeof(Rank)))
@@ -39,11 +39,11 @@ namespace PokerLib2Tests
             int iCardCount = 0;
             foreach (Card card in cards)
             {                
-                //For each card, see if the card.ToString() can be rebuilt using Rank and Suit ToChar()
-                Assert.IsTrue(card.ToString() == card.Rank.ToChar().ToString() + card.Suit.ToChar().ToString());
+                //For each card, see if the card.ToString() can be rebuilt using Rank and Suit ToLetter()
+                Assert.IsTrue(card.ToString() == card.Rank.ToLetter() + card.Suit.ToLetter());
 
                 //See if the Char ToRank() and ToSuit() extensions can rebuild the card
-                Assert.IsTrue(card.Equals(new Card(card.Rank.ToChar() + card.Suit.ToChar().ToString())));
+                Assert.IsTrue(card.Equals(new Card(card.Rank.ToLetter() + card.Suit.ToLetter())));
                 iCardCount++;
             }
             Assert.IsTrue(iCardCount == 52);
