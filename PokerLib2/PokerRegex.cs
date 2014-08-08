@@ -13,7 +13,7 @@ namespace PokerLib2
         public const string rank = @"[2-9TJQKA]";
         public const string suit = @"[cdhs]";
         public const string card = rank + suit;
-        public const string hand = "(" + card + @")(?!\1)" + card; //([2-9,T,J,Q,K,A][c,d,h,s])(?!\1)[2-9,T,J,Q,K,A][c,d,h,s]
+        public const string hand = "(" + card + @")(?!\1)" + card; //([2-9TJQKA][cdhs])(?!\1)[2-9TJQKA][cdhs]
         public const string suitedness = @"[os]";
         public const string shortHandFormat = @"((" + rank + @")(?!\2)" + rank + suitedness + ")|(" + rank + rank + @")";
 
@@ -24,8 +24,7 @@ namespace PokerLib2
             public const string groupOperators = @"[\+\-]";
             public const string singleHand = "^" + hand + "$"; //AsKc, 9h9s
             public const string handGroup = "^" + @"((" + rank + @")(?!\2)" + rank + suitedness + @")$|^(" + rank + rank + @")$"; //AK, AKo, AKs, 99
-            
-            //[2-9,T,J,Q,K,A]\*[o,s]?|\*[2-9,T,J,Q,K,A][o,s]?|\*\*[o,s]?
+                        
             //A*, *A, A*s, *Ao, **, **s
             public const string wildGroup = "^" + rank + @"\*" + suitedness + @"?$|^\*" + rank + suitedness + @"?$|^\*\*" + suitedness + "?$";
             

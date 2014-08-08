@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using PokerLib2;
 using System.Windows.Forms;
-
+using System.Linq;
 
 namespace PokerLib2Tests
 {
+
+
     [TestClass]
     public class StartingHandTest
     {
@@ -46,6 +48,95 @@ namespace PokerLib2Tests
             Assert.IsTrue(_startingHandCombos.Count == (52 * 51) / 2, "Incorrect number of combo's.");
             Assert.IsTrue(_startingHandPermutations.Count == 52 * 51, "Incorrect number of permutations.");
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void Constructor_DuplicateCards_Throws()
+        {
+            StartingHand hand = new StartingHand(new Card(Rank.Ace, Suit.Diamonds), new Card("AsKd"));
+        }
+
+        [TestMethod]        
+        [ExpectedException(typeof(ArgumentException))]
+        public void Constructor_EmptyString_Throws()
+        {
+            StartingHand hand = new StartingHand("");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void Constructor_NullInsteadofString_Throws()
+        {
+            StartingHand hand = new StartingHand(null);
+        }
+
+        [TestMethod]        
+        public void Constructor_MalformedHandString_CatchesSoItPasses()
+        {
+            //Invalid Capitolization
+            InvalidConstructorString("asKd");
+            InvalidConstructorString("ASKd");
+            InvalidConstructorString("Askd");
+            InvalidConstructorString("AsKD");
+
+            //Invalid Whitespace
+            InvalidConstructorString("As Kd");
+            InvalidConstructorString("AsK ");
+            InvalidConstructorString("As d");
+            InvalidConstructorString("A Kd");            
+            InvalidConstructorString(" sKd");
+
+            //Invalid Length
+            InvalidConstructorString("AsKdd");
+            InvalidConstructorString("AsKd ");
+            InvalidConstructorString(" AsKd");
+            InvalidConstructorString("AssKd");
+
+            //Invalid capitolization
+            InvalidConstructorString("askd");
+            InvalidConstructorString("ASKD");
+
+            //Duplicate Cards
+            InvalidConstructorString("9s9s");
+            InvalidConstructorString("KdKd");
+           
+            //Short Hand Format is used
+            InvalidConstructorString("99s");
+            InvalidConstructorString("99o");
+            InvalidConstructorString("99");
+            InvalidConstructorString("AK");
+            InvalidConstructorString("AKo");
+            InvalidConstructorString("AKs");
+
+        }
+
+        public void InvalidConstructorString(string test)
+        {
+            try
+            {
+                StartingHand hand = new StartingHand(test);
+                Assert.Fail("This hand should have thrown an exception:" + test);
+            }
+            catch (ArgumentException e)
+            {
+
+            }
+        }
+
+        [TestMethod]
+        public void Gap_TestGapsForVariousHands_Passes()
+        {
+            Assert.AreEqual(0, new StartingHand("9s9c").Gap());
+            Assert.AreEqual(1, new StartingHand("7s6c").Gap());
+            Assert.AreEqual(1, new StartingHand("6s7c").Gap());
+
+            Assert.AreEqual(5, new StartingHand("7s2c").Gap());
+            Assert.AreEqual(2, new StartingHand("AsQc").Gap());
+            Assert.AreEqual(5, new StartingHand("2s7c").Gap());
+            Assert.AreEqual(2, new StartingHand("QsAc").Gap());
+
+        }
+
 
         [TestMethod]
         public void ToString_Matches_Expected_Regex()
@@ -99,7 +190,7 @@ namespace PokerLib2Tests
         }
 
         [TestMethod]
-        public void Every_StartingHand_has_correct_Equality_for_all_matching_modes()
+        public void Equals_EveryStartingHandHasCorrectMatchesForAllMatchingModesAndOrders_Passes()
         {
             foreach (StartingHand hand1 in _startingHandPermutations.Values)
             {
@@ -164,7 +255,7 @@ namespace PokerLib2Tests
         }
 
         [TestMethod]
-        public void ToStringCreatesValidStartingHands()
+        public void ToString_CreatesExactOrderedOrginalHands_Passes()
         {
             foreach (StartingHand hand in _startingHandPermutations.Values)
             {
@@ -174,12 +265,81 @@ namespace PokerLib2Tests
         }
 
         [TestMethod]
-        public void TestingEquals()
+        public void ComparisonOperators_CommonUsageWorksAsExpected_Passes()
         {
-            StartingHand hand = new StartingHand("AcKs");
-            hand.Equals(new StartingHand("AsKc"));
+            Assert.IsTrue(new StartingHand("7s3c") > new StartingHand("2s7c"));
+            Assert.IsTrue(new StartingHand("7s2c") < new StartingHand("3s7c"));
+
+            Assert.IsFalse(new StartingHand("7s2c") < new StartingHand("7c2s"));
+            Assert.IsFalse(new StartingHand("AsKc") < new StartingHand("7c2s"));
+
+            Assert.IsTrue(new StartingHand("9s9h") > new StartingHand("9s9c"));
+            Assert.IsTrue(new StartingHand("7s2c") < new StartingHand("3s7c"));
         }
 
+        [TestMethod]
+        public void CompareTo_RecreateSortedArrayFromRandomArray_Passes()
+        {
+            List<StartingHand> copyA = new List<StartingHand>();
+            List<StartingHand> copyB = new List<StartingHand>();
+            List<StartingHand> sortedB = new List<StartingHand>();
+
+            foreach (StartingHand h in _startingHandPermutations.Values)
+            {
+                copyA.Add(h);
+                copyB.Add(h);       
+            }
+
+            Random iRand = new Random();
+            do{ 
+                int i = iRand.Next(copyA.Count - 1);
+                sortedB.Add(copyA[i]);
+                copyA.RemoveAt(i);
+            }while(copyA.Count > 0);
+
+            Assert.IsFalse(EqualLists(copyB, sortedB));
+
+            sortedB.Sort();
+            copyB.Sort();
+
+            Assert.IsTrue(EqualLists(copyB, sortedB));
+        }
+
+        public bool EqualLists(List<StartingHand> listA, List<StartingHand> listB)
+        {
+            if (listA.Count != listB.Count)
+                return false;
+
+            for(int i = 0; i < listA.Count; i++)
+            {
+                if (listA[i].Equals(listB[i], StartingHand.MatchingMode.ExactSuits) == false)
+                    return false;
+            }
+
+            return true;
+        }
+        
+        [TestMethod]
+        public void HighCardAndLowCard_ConsistentEvenWithPPs_Pass()
+        {
+            StartingHand hand = new StartingHand("9s9c");
+            StartingHand revHand = new StartingHand("9c9s");
+
+            Assert.IsTrue(hand.Equals(revHand, StartingHand.MatchingMode.ExactSuits));
+            Assert.IsFalse(hand.Equals(revHand, StartingHand.MatchingMode.ExactSuits, false));
+
+            Assert.IsTrue(hand.HighCard == revHand.HighCard);
+            Assert.IsTrue(hand.LowCard == revHand.LowCard);
+
+            hand = new StartingHand("Th9d");
+            revHand = new StartingHand("9dTh");
+
+            Assert.IsTrue(hand.Equals(revHand, StartingHand.MatchingMode.ExactSuits));
+            Assert.IsFalse(hand.Equals(revHand, StartingHand.MatchingMode.ExactSuits, false));
+
+            Assert.IsTrue(hand.HighCard == revHand.HighCard);
+            Assert.IsTrue(hand.LowCard == revHand.LowCard);
+        }
 
     }
 }
