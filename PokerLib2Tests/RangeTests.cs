@@ -93,7 +93,7 @@ namespace PokerLib2Tests
 
         }
 
-        public void TestRange(string range, float expectedCombos)
+        public void TestRange(string range, double expectedCombos)
         {
             Range testRange = new Range(range);
             Assert.AreEqual(expectedCombos, testRange.Combos(), range);

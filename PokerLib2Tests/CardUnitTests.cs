@@ -100,6 +100,7 @@ namespace PokerLib2Tests
         {
             Assert.IsTrue(new Card("Tc") == new Card(Rank.Ten, Suit.Clubs));
             Assert.IsTrue(new Card("Tc") != new Card(Rank.Ten, Suit.Spades));
+
             Assert.IsTrue(null != new Card(Rank.Ten, Suit.Spades));
             Assert.IsFalse(null == new Card(Rank.Ten, Suit.Spades));
             Assert.IsTrue(new Card(Rank.Ten, Suit.Spades) != null);

@@ -278,31 +278,31 @@ namespace PokerLib2Tests
         }
 
         [TestMethod]
-        public void CompareTo_RecreateSortedArrayFromRandomArray_Passes()
+        public void CompareTo_ValidateSortingForAllPerms_Passes()
         {
-            List<StartingHand> copyA = new List<StartingHand>();
-            List<StartingHand> copyB = new List<StartingHand>();
-            List<StartingHand> sortedB = new List<StartingHand>();
+            List<StartingHand> copy = new List<StartingHand>();
+            List<StartingHand> sorted = new List<StartingHand>();
+            List<StartingHand> shuffled = new List<StartingHand>();
 
             foreach (StartingHand h in _startingHandPermutations.Values)
             {
-                copyA.Add(h);
-                copyB.Add(h);       
+                copy.Add(h);
+                sorted.Add(h);       
             }
 
             Random iRand = new Random();
             do{ 
-                int i = iRand.Next(copyA.Count - 1);
-                sortedB.Add(copyA[i]);
-                copyA.RemoveAt(i);
-            }while(copyA.Count > 0);
+                int i = iRand.Next(copy.Count - 1);
+                shuffled.Add(copy[i]);
+                copy.RemoveAt(i);
+            }while(copy.Count > 0);
 
-            Assert.IsFalse(EqualLists(copyB, sortedB));
+            Assert.IsFalse(EqualLists(sorted, shuffled));
 
-            sortedB.Sort();
-            copyB.Sort();
+            shuffled.Sort();
+            sorted.Sort();
 
-            Assert.IsTrue(EqualLists(copyB, sortedB));
+            Assert.IsTrue(EqualLists(sorted, shuffled));
         }
 
         public bool EqualLists(List<StartingHand> listA, List<StartingHand> listB)

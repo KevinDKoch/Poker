@@ -35,7 +35,7 @@ namespace PokerLib2
                 string suitedness = Regex.Match(hand, @"(?<=" + PokerRegex.rank + PokerRegex.rank + ")" + PokerRegex.suitedness).Value;
                 //Get and trim the weight
                 //TODO: Throw an exception if we attempt to add a hand already in the range that contains a different weight
-                float weight = 1;
+                double weight = 1;
                 if (Regex.IsMatch(tok, PokerRegex.weight + "$")) 
                 { 
                     weight = Convert.ToSingle(Regex.Match(hand, PokerRegex.weight).Value.TrimStart('(').TrimEnd(')'));
@@ -285,9 +285,9 @@ namespace PokerLib2
         /// <para>AKs(.5) = 2 combos</para>
         /// </summary>
         /// <returns>The number of combinations after adjusting for weight.</returns>
-        public float Combos()
+        public double Combos()
         {
-            float totalCombos = 0;
+            double totalCombos = 0;
 
             foreach (WeightedStartingHand hand in _hands)
             {
@@ -297,7 +297,7 @@ namespace PokerLib2
             return totalCombos;
         }
 
-        //TODO: ToString Short format for ranges
+        //TODO: ToString Short format for ranges, or perhaps keep a copy of orginal string
         public override string ToString()
         {
             string rangeStr = "{";
