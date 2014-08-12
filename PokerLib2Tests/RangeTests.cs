@@ -118,9 +118,72 @@ namespace PokerLib2Tests
             Assert.IsFalse(Range.IsValidRange("{AK-22s}"));
             Assert.IsFalse(Range.IsValidRange("{AK-22s}"));
             
+        }
 
+        [TestMethod]
+        public void Add_AddingDuplicateWeightedStartingHandOfDifferentWeight_Passes()
+        {
+            Range r = new Range("AKs(.25)");
+            r.ToString();
+
+            Assert.AreEqual(4, r.Count);
+            r.Add(new WeightedStartingHand("AcKc(.255)"));
+            Assert.AreEqual(4, r.Count);
+            Assert.IsFalse(r.Contains(new WeightedStartingHand("AcKc(.25)")));
+            Assert.IsTrue(r.Contains(new WeightedStartingHand("AcKc(.255)")));
 
         }
 
+        [TestMethod]
+        public void Equals_RangeOrderDoesNotMatter_Passes()
+        {
+            Range r1 = new Range("99(.5),AKs");
+            Range r2 = new Range("AKs,99(.5)");
+
+            Assert.IsTrue(r1.Equals(r2), "Equality Failed when order was changed.");
+        }
+
+        [TestMethod]
+        public void Equals_SameRangeCreatedWithDifferentStrings_Passes()
+        {
+            Range r1 = new Range("77+,66+");
+            Range r2 = new Range("66+");
+
+            Assert.IsTrue(r1.Equals(r2), "Equality Failed with equal range strings.");
+
+            r1.AddRange(new Range("A5s-A2s,A*s").Hands);
+            r2.AddRange(new Range("AKs-A2s").Hands);
+
+            Assert.IsTrue(r1.Equals(r2), "Equality Failed with equal range strings.");
+
+            r1.AddRange(new Range("A5s-A2s(.1),A*s(.5)").Hands);
+            r2.AddRange(new Range("AKs-A2s(.5)").Hands);
+
+            Assert.IsTrue(r1.Equals(r2), "Equality Failed with equal range strings.");
+
+        }
+
+        [TestMethod]
+        public void Equals_OrderMatterWithStringCreationAndWeighting_Passes()
+        {
+            Range r1 = new Range("22+,TT+(.5)");
+            Range r2 = new Range("TT+(.5),22+");
+
+            Assert.IsFalse(r1.Equals(r2), "Equality was unexpectedly equal.");
+            
+            Assert.IsTrue(r1.Equals(new Range("TT+(.5),99-22")), "Equality was expected to be equal.");
+            Assert.IsTrue(r2.Equals(new Range("22+")), "Equality was expected to be equal.");            
+        }
+
+        [TestMethod]
+        public void ToString_highCardFirstSortsStartingHandOrder_Passes()
+        {
+            Range r1 = new Range("AcKs,QcQs");
+            Range r2 = new Range("KsAc,QsQc");
+
+            Assert.IsTrue(r1.ToString() != r2.ToString());
+            Assert.IsTrue(r1.ToString(true) == r2.ToString(true));
+            Assert.IsTrue(r1.ToString(true) != r2.ToString(false));
+        }
     }
 }

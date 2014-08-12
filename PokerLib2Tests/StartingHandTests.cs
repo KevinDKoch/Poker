@@ -119,7 +119,7 @@ namespace PokerLib2Tests
             }
             catch (ArgumentException e)
             {
-
+                
             }
         }
 

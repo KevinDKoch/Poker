@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace PokerLib2
 {
-    public class WeightedStartingHand : StartingHand
+    public class WeightedStartingHand : StartingHand, IEquatable<WeightedStartingHand>
     {
         protected readonly double _weight;
         public double Weight { get { return _weight; } }
@@ -48,7 +48,7 @@ namespace PokerLib2
                 if (Regex.IsMatch(weight, PokerRegex.weight) == false)
                     throw new ArgumentException("Hand weight is not recognizable:" + weight);
 
-                _weight = Convert.ToSingle(weight.Trim(new char[] { '(', ')' }));
+                _weight = Convert.ToDouble(weight.Trim(new char[] { '(', ')' }));
                 ValidateWeight(_weight);
             }
         }
@@ -86,7 +86,6 @@ namespace PokerLib2
                 return false;
 
             if (other is WeightedStartingHand)
-                //return this._weight == ((WeightedStartingHand)other).Weight;
                 return Equals((WeightedStartingHand)other);
 
             return _weight == 1;
@@ -98,7 +97,6 @@ namespace PokerLib2
                 return false;
 
             if (other is WeightedStartingHand)            
-                //return this._weight == ((WeightedStartingHand)other).Weight;
                 return Equals((WeightedStartingHand)other);
             else
                 return _weight == 1;
@@ -131,5 +129,16 @@ namespace PokerLib2
                 throw new ArgumentOutOfRangeException("The weight of a starting hand must be > 0 and <= 1.");
             }
         }
-    }
+        public override string ToString()
+        {
+            string weightStr = (this._weight != 1) ? ("(" + this._weight.ToString() + ")") : String.Empty;
+            return base.ToString(false, false) + weightStr;
+        }
+
+        public override string ToString(bool shortFormat, bool sorted = false)
+        {
+            string weightStr = (this._weight != 1) ? ("(" + this._weight.ToString() + ")") : String.Empty;
+            return base.ToString(shortFormat, sorted) + weightStr;
+        }
+    }   
 }

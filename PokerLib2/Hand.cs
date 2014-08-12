@@ -79,8 +79,8 @@ namespace PokerLib2
                     break;
             }
 
-            Single sb = Convert.ToSingle(Regex.Match(lines[i],@"(\d+|0?\.\d\d?)(?=\/)").Value);
-            Single bb = Convert.ToSingle(Regex.Match(lines[i], @"(?<=\/\D)(\d+|0?\.\d\d?)|(?<=\/)(\d+|0?\.\d\d?)").Value);
+            Double sb = Convert.ToDouble(Regex.Match(lines[i],@"(\d+|0?\.\d\d?)(?=\/)").Value);
+            Double bb = Convert.ToDouble(Regex.Match(lines[i], @"(?<=\/\D)(\d+|0?\.\d\d?)|(?<=\/)(\d+|0?\.\d\d?)").Value);
             _stakes = new Stakes(sb, bb, 0, cur);
 
             //Date Played
@@ -163,7 +163,7 @@ namespace PokerLib2
             {
                 //Grab the amount, if there is one
                 string betAmt = Regex.Match(line, @"(?:\.\d\d?)|(?:[\d,]+(\.\d\d?)?)").Value;
-                Single amt = (betAmt.Length > 0 && Char.IsDigit(betAmt[betAmt.Length-1]))? Convert.ToSingle(Regex.Replace(betAmt, ",", "")):0;
+                Double amt = (betAmt.Length > 0 && Char.IsDigit(betAmt[betAmt.Length-1]))? Convert.ToDouble(Regex.Replace(betAmt, ",", "")):0;
 
                 if ("folds" == Regex.Match(line, @"^\S+").Value)
                 {
@@ -334,7 +334,7 @@ namespace PokerLib2
             {
                 PlayerInfo winningPlayer = _players[Regex.Match(line, @"^.*(?= wins )").Value];
                 string pot = Regex.Match(line, @"(?:\.\d\d?)|(?:[\d,]+(\.\d\d?)?)").Value;
-                Double potSize = (pot.Length > 0 && Char.IsDigit(pot[pot.Length - 1])) ? Convert.ToSingle(Regex.Replace(pot, ",", "")) : 0;
+                Double potSize = (pot.Length > 0 && Char.IsDigit(pot[pot.Length - 1])) ? Convert.ToDouble(Regex.Replace(pot, ",", "")) : 0;
 
                 //Side Pot
                 int sidePot = 0;

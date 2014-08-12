@@ -61,6 +61,13 @@ namespace PokerLib2Tests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void Constructor_NegativeUsedForWeightInString_throws()
+        {
+            WeightedStartingHand hand = new WeightedStartingHand("AsKh(-.01)");
+        }
+
+        [TestMethod]
         public void Equals_SameHandsWithDifferentWeightsAreNotEqual_Passes()
         {
             WeightedStartingHand smallerWeight = new WeightedStartingHand("AsKc", .5);
@@ -81,8 +88,50 @@ namespace PokerLib2Tests
             StartingHand SH = hand;
             Assert.IsTrue(new WeightedStartingHand("QcQs", .25).Equals(SH));
 
+            SH = new StartingHand("QcQs");
+            Assert.IsFalse(new WeightedStartingHand("QcQs", .25).Equals(SH));
+
         }
 
+        [TestMethod]
+        public void EqualityOperator_NullComparisons_Passes()
+        {
+            Assert.IsTrue((WeightedStartingHand)null == (WeightedStartingHand)null);
+            Assert.IsFalse((WeightedStartingHand)null == new WeightedStartingHand("AsKs", .5));
+            Assert.IsFalse(new WeightedStartingHand("AsKs", .5)==(WeightedStartingHand)null);
+        }
+
+        [TestMethod]
+        public void InequalityOperator_NullComparisons_Passes()
+        {
+            Assert.IsFalse((WeightedStartingHand)null != (WeightedStartingHand)null);
+            Assert.IsTrue((WeightedStartingHand)null != new WeightedStartingHand("AsKs", .5));
+            Assert.IsTrue(new WeightedStartingHand("AsKs", .5) != (WeightedStartingHand)null);
+        }       
+
+        [TestMethod]
+        public void ToString_IncludesWeight_Passes()
+        {
+            Assert.AreEqual("AcKh(0.333)", new WeightedStartingHand("AcKh", .333).ToString());
+            Assert.AreEqual("AcKh", new WeightedStartingHand("AcKh", 1).ToString());
+
+            WeightedStartingHand testDecimals = new WeightedStartingHand("3c2h", .333);
+            Assert.AreEqual(testDecimals.ToString(), new WeightedStartingHand(testDecimals.ToString()).ToString());
+
+            string hand = "AcKh(0.333)";
+            Assert.AreEqual(hand, new WeightedStartingHand(new WeightedStartingHand("AcKh", .333).ToString()).ToString());
+
+        }
+        [TestMethod]
+        public void ToStringOverloads_FormatingWorksAsExpected_Passes()
+        {
+
+            WeightedStartingHand hand = new WeightedStartingHand("KhQd", .5);
+            Assert.IsTrue(hand.ToString(true) == "KQo(0.5)");
+
+            Assert.IsTrue(new WeightedStartingHand("QhKh", .5).ToString(true, true) == "KQs(0.5)");
+
+        }
 
     }
 }

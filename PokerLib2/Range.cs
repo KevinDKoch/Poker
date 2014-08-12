@@ -5,26 +5,32 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
+
 namespace PokerLib2
 {
-    public class Range
+    public class Range:IList<WeightedStartingHand>, IEquatable<Range>
     {
-        protected List<WeightedStartingHand> _hands = new List<WeightedStartingHand>();
-        public List<WeightedStartingHand> Hands { get { return _hands; } set { _hands = value; } }
-        
+        protected List<WeightedStartingHand> hands = new List<WeightedStartingHand>();
+        public List<WeightedStartingHand> Hands { get { return this.hands; } set { this.hands = value; } }
+
+        public string RangeString { get; private set; }
+
         public Range(List<WeightedStartingHand> hands)
-        {
-            _hands = hands;
+        {            
+            this.hands = hands;
         }
 
         public Range(string range)
         {
-            if (string.IsNullOrEmpty(range))            
-                throw new ArgumentNullException("The range string cannot be null or empty.");
 
+            if(ReferenceEquals(range, null))
+                throw new ArgumentNullException(range, "range cannot be null.");
+
+            StringBuilder errMsg = new StringBuilder();
             if (IsValidRange(range) == false)            
-                throw new ArgumentException("Invalid Range:" + range);
+                throw new ArgumentException("Invalid Range: " + errMsg + ":" + range);
 
+            this.RangeString = range;
             range = range.TrimStart('{').TrimEnd('}');
             range = Regex.Replace(range, @"\s", String.Empty);
             string[] tokens = range.Split(',');
@@ -33,18 +39,17 @@ namespace PokerLib2
                 string hand = tok;
 
                 string suitedness = Regex.Match(hand, @"(?<=" + PokerRegex.rank + PokerRegex.rank + ")" + PokerRegex.suitedness).Value;
-                //Get and trim the weight
-                //TODO: Throw an exception if we attempt to add a hand already in the range that contains a different weight
+                //Get and trim the weight                
                 double weight = 1;
                 if (Regex.IsMatch(tok, PokerRegex.weight + "$")) 
                 { 
-                    weight = Convert.ToSingle(Regex.Match(hand, PokerRegex.weight).Value.TrimStart('(').TrimEnd(')'));
+                    weight = Convert.ToDouble(Regex.Match(hand, PokerRegex.weight).Value.TrimStart('(').TrimEnd(')'));
                     hand = Regex.Replace(tok, PokerRegex.weight + "$", string.Empty);
                 }
                                 
                 if (Regex.IsMatch(hand, PokerRegex.RangeGroups.singleHand ))
                 {
-                    _hands.Add(new WeightedStartingHand(hand));
+                    this.Add(new WeightedStartingHand(hand));
                 }
                 else if ((Regex.IsMatch(hand, PokerRegex.RangeGroups.handGroup)) || //Ex: AK,AKs,99  
                          (Regex.IsMatch(hand, PokerRegex.RangeGroups.wildGroup)))   //Ex: A*, *A, **, A*s, *Ao, **s
@@ -76,14 +81,14 @@ namespace PokerLib2
                                     if (first.Equals(second) == false)
                                     {
                                         WeightedStartingHand newHand = new WeightedStartingHand(first, second, weight);
-                                        if (_hands.Contains(newHand) == false)
+                                        if (this.hands.Contains(newHand) == false)
                                         {                   
                                             //Filter for suitedness
                                             if ((hand.EndsWith("s") && newHand.IsSuited()) ||
                                                (hand.EndsWith("o") && !newHand.IsSuited() && newHand.FirstCard.Rank != newHand.SecondCard.Rank) || //PP's are offsuit, but can't be written as 99o
                                                (!Regex.IsMatch(hand, PokerRegex.suitedness))) //Groups that don't filter for suitedness
                                             {                                                
-                                                _hands.Add(newHand);
+                                                this.Add(newHand);
                                             }
                                         }
                                     }
@@ -124,7 +129,7 @@ namespace PokerLib2
                         Range newHands = new Range(curHand.HighCard.Rank.ToLetter() +
                                                    curHand.LowCard.Rank.ToLetter() +
                                                    suitedness + "(" + weight.ToString() + ")");
-                        _hands.AddRange(newHands.Hands);
+                        this.AddRange(newHands.Hands);
 
                         //Get the next hand group
                         Rank nextHiRank = curHand.HighCard.Rank + verticalStep;
@@ -151,7 +156,7 @@ namespace PokerLib2
                         else//Ex: 76s+
                             newHands = new Range(hand[0].ToString() + hand[1].ToString() + suitedness + "-A" + ('A'.ToRank() - startHand.Gap()).ToLetter() + suitedness + "(" + weight + ")");
 
-                        _hands.AddRange(newHands.Hands);
+                        this.AddRange(newHands.Hands);
                     }
                     else
                     {
@@ -161,7 +166,7 @@ namespace PokerLib2
                         else//76s-
                             newHands = new Range(hand[0] + hand[1] + suitedness + "-2" + ('2'.ToRank() + startHand.Gap()).ToLetter() + suitedness + "(" + weight + ")");
 
-                        _hands.AddRange(newHands.Hands);
+                        this.AddRange(newHands.Hands);
                     }                                       
                 }
             }
@@ -174,7 +179,13 @@ namespace PokerLib2
         /// <param name="errorMsg">Contains any error message pertaining to invalid ranges.</param>
         /// <returns>True if the range is valid.</returns>
         public static bool IsValidRange(string range, StringBuilder errorMsg = null)
-        {            
+        {
+            if (string.IsNullOrEmpty(range))
+            {
+                errorMsg.Append("Range cannot be null or empty.");
+                return false;   
+            }
+                
             if(errorMsg == null) errorMsg = new StringBuilder();
 
             bool foundMatch = false;
@@ -289,7 +300,7 @@ namespace PokerLib2
         {
             double totalCombos = 0;
 
-            foreach (WeightedStartingHand hand in _hands)
+            foreach (WeightedStartingHand hand in this.hands)
             {
                 totalCombos += hand.Weight;
             }
@@ -297,15 +308,17 @@ namespace PokerLib2
             return totalCombos;
         }
 
-        //TODO: ToString Short format for ranges, or perhaps keep a copy of orginal string
         public override string ToString()
         {
+            return ToString(false);
+        }
+
+        public string ToString(bool highCardsFirst)
+        {
             string rangeStr = "{";
-            foreach (WeightedStartingHand hand in _hands)
+            foreach (WeightedStartingHand hand in this.hands)
             {
-                rangeStr += hand.ToString(false, true);
-                if( hand.Weight < 1)
-                    rangeStr += "(" + hand.Weight + ")";
+                rangeStr += hand.ToString(false, highCardsFirst);
                 rangeStr += ",";
             }
             rangeStr = rangeStr.TrimEnd(',') + "}";
@@ -313,10 +326,133 @@ namespace PokerLib2
             return rangeStr;
         }
 
-        //TODO: Equals for ranges
-        //public override bool Equals(object obj)
-        //{            
-        //    return base.Equals(obj);
-        //}
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+                return false;
+
+            if (obj is Range == false)
+                return false;
+
+            return Equals((Range)obj);
+        }
+
+        public bool Equals(Range other)
+        {
+            if ((Object)other == null)
+                return false;
+
+            if(this.hands.Count != other.Count)
+                return false;
+
+            foreach (WeightedStartingHand hand in other.Hands)
+            {
+                if (this.Hands.Contains(hand) == false)
+                    return false;
+            }
+
+            return true;
+        }        
+
+#region IList Implementation
+
+        public int IndexOf(WeightedStartingHand item)
+        {
+            return this.hands.IndexOf(item);
+        }
+
+        public void Insert(int index, WeightedStartingHand item)
+        {
+            this.hands.Insert(index, item);
+        }
+
+        public void RemoveAt(int index)
+        {
+            this.hands.RemoveAt(index);
+        }
+
+        public WeightedStartingHand this[int index]
+        {
+            get
+            {
+                return this.hands[index];
+            }
+            set
+            {
+                this.hands[index] = value;
+            }
+        }
+
+        public void Clear()
+        {
+            this.hands.Clear();
+        }
+
+        public bool Contains(WeightedStartingHand item)
+        {
+            return this.hands.Contains(item);            
+        }
+
+        public void CopyTo(WeightedStartingHand[] array, int arrayIndex)
+        {
+            this.hands.CopyTo(array, arrayIndex);
+        }
+
+        public int Count
+        {
+            get {return this.hands.Count;}
+        }
+
+        public bool IsReadOnly
+        {
+            get { return ((IList<WeightedStartingHand>)this.hands).IsReadOnly; }
+        }
+
+        public bool Remove(WeightedStartingHand item)
+        {
+            return this.hands.Remove(item);
+        }
+
+        public IEnumerator<WeightedStartingHand> GetEnumerator()
+        {
+            return this.hands.GetEnumerator();
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        /// <summary>
+        /// Adds a WeightedStartingHand to the range.  If a hand already exists, it is overwritten (with a potentially new weight).
+        /// </summary>
+        /// <param name="item">The hand to add.</param>
+        public void Add(WeightedStartingHand item)
+        {
+            foreach (WeightedStartingHand h in this.hands)
+            {                                
+                if (((StartingHand)h) == ((StartingHand)item))
+                {                    
+                    this.hands.Remove(h);
+                    break;
+                }
+            }
+            
+            this.hands.Add(item);
+        }
+
+        /// <summary>
+        /// Adds a list of WeightStartingHands.  If a hand already exists, it is overwritten (with a potentially new weight).
+        /// </summary>
+        /// <param name="items">The range to add.</param>
+        public void AddRange(List<WeightedStartingHand> items)
+        {
+            foreach (WeightedStartingHand hand in items)
+            {
+                this.Add(hand);
+            }
+        }
     }
+
+    #endregion    
 }
