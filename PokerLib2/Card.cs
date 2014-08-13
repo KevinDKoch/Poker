@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PokerLib2
+namespace PokerLib2.Game
 {
     public struct Card : IEquatable<Card>,IComparable<Card>
     {

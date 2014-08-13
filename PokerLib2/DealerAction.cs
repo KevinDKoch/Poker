@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PokerLib2.Game;
 
-namespace PokerLib2
+namespace PokerLib2.HandHistory
 {    
     public abstract class DealerAction : Action
     {        

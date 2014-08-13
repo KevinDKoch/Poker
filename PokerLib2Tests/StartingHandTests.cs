@@ -5,11 +5,11 @@ using System.Text.RegularExpressions;
 using PokerLib2;
 using System.Windows.Forms;
 using System.Linq;
+using PokerLib2.Game;
+using PokerLib2.HandHistory;
 
 namespace PokerLib2Tests
 {
-
-
     [TestClass]
     public class StartingHandTest
     {

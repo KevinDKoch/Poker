@@ -2,6 +2,8 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PokerLib2;
 using System.Collections.Generic;
+using PokerLib2.Game;
+using PokerLib2.HandHistory;
 
 namespace PokerLib2Tests
 {

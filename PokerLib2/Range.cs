@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 
-namespace PokerLib2
+namespace PokerLib2.Game
 {
     public class Range:IList<WeightedStartingHand>, IEquatable<Range>
     {

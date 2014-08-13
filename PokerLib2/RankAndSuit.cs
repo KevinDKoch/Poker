@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PokerLib2
+namespace PokerLib2.Game
 {
     public enum Rank { Two = 2, Three = 3, Four = 4, Five = 5, Six = 6, Seven = 7, Eight = 8, Nine = 9, Ten = 10, Jack = 11, Queen = 12, King = 13, Ace = 14 }
 
@@ -16,6 +16,21 @@ namespace PokerLib2
                 return ((int)rank).ToString()[0].ToString();
             else
                 return rank.ToString()[0].ToString();
+        }
+    }
+
+    public enum Suit { Clubs = 1, Diamonds = 2, Hearts = 3, Spades = 4 }
+
+    public static class SuitExtension
+    {
+        /// <summary>
+        /// Returns a single letter which represents a card suit.  ex: Clubs == "c"
+        /// </summary>
+        /// <param name="suit">The suit to get the letter for.</param>
+        /// <returns>The letter which representing the suit.</returns>
+        public static string ToLetter(this Suit suit)
+        {
+            return suit.ToString().ToLower()[0].ToString();
         }
     }
 

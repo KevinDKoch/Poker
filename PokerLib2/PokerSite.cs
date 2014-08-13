@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PokerLib2
+namespace PokerLib2.HandHistory
 {
     public class PokerSite
     {

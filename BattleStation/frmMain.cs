@@ -10,6 +10,8 @@ using System.Windows.Forms;
 using Npgsql;
 using PokerLib2;
 using System.IO;
+using PokerLib2.Game;
+using PokerLib2.HandHistory;
 
 namespace BattleStation
 {

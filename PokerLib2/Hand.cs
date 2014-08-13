@@ -5,8 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Collections.ObjectModel;
+using PokerLib2.Game;
 
-namespace PokerLib2
+namespace PokerLib2.HandHistory
 {
     public class HeadsUpHand
     {        

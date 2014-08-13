@@ -53,10 +53,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PokerSite.cs" />
     <Compile Include="Range.cs" />
-    <Compile Include="Rank.cs" />
+    <Compile Include="RankAndSuit.cs" />
     <Compile Include="Stakes.cs" />
     <Compile Include="StartingHand.cs" />
-    <Compile Include="Suit.cs" />
     <Compile Include="WeightedStartingHand.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

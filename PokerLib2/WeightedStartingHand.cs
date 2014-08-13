@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 
-namespace PokerLib2
+namespace PokerLib2.Game
 {
     public class WeightedStartingHand : StartingHand, IEquatable<WeightedStartingHand>
     {
