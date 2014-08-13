@@ -36,6 +36,11 @@ namespace PokerLib2.Game
 
     public static class CharExtension
     {
+        /// <summary>
+        /// Returns a letter representing a card rank. ex: King == "K"
+        /// </summary>
+        /// <param name="rank">The rank to convert to a letter.</param>
+        /// <returns>A single letter representing a rank.</returns>
         public static Rank ToRank(this char rank)
         {
             switch (rank.ToString())

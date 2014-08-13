@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EVWhenPFRCalled", "EVWhenPFRCalled\EVWhenPFRCalled.csproj", "{3687F039-9D6F-4B2B-9709-48DFA85825F7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokerLib2", "..\PokerLib2\PokerLib2.csproj", "{ABA326E6-BDC1-4316-B5BE-929D6B696148}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{3687F039-9D6F-4B2B-9709-48DFA85825F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3687F039-9D6F-4B2B-9709-48DFA85825F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3687F039-9D6F-4B2B-9709-48DFA85825F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABA326E6-BDC1-4316-B5BE-929D6B696148}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABA326E6-BDC1-4316-B5BE-929D6B696148}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABA326E6-BDC1-4316-B5BE-929D6B696148}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABA326E6-BDC1-4316-B5BE-929D6B696148}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
