@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Collections.ObjectModel;
 using PokerLib2.Game;
+using PokerLib2.HandHistory;
 
 namespace PokerLib2.HandHistory
 {
@@ -247,8 +248,8 @@ namespace PokerLib2.HandHistory
                 }//All-In
                 else if (Regex.IsMatch(line, @"shows"))
                 {
-                    Card card1 = new Card(Regex.Match(line, @"(?<=\[\s+)\S+").Value);
-                    Card card2 = new Card(Regex.Match(line, @"(?<=\[\s+\S\S )\S+").Value);
+                    Card card1 = new Card(Regex.Match(line, @"(?<=\[\s+)\S\S").Value);
+                    Card card2 = new Card(Regex.Match(line, @"(?<=\[\s+\S\S, )\S+").Value);
                     _actions.Add(new ShowsDownHand(actingPlayer, _actions.Last().Street, card1, card2,true ));
                 }
                 else if (Regex.IsMatch(line, @"does not show"))
@@ -257,8 +258,8 @@ namespace PokerLib2.HandHistory
                 }
                 else if (Regex.IsMatch(line, @"doesn't show \["))
                 {
-                    Card card1 = new Card(Regex.Match(line, @"(?<=\[\s+)\S+").Value);
-                    Card card2 = new Card(Regex.Match(line, @"(?<=\[\s+\S\S )\S+").Value);
+                    Card card1 = new Card(Regex.Match(line, @"(?<=\[\s+)\S\S").Value);
+                    Card card2 = new Card(Regex.Match(line, @"(?<=\[\s+\S\S, )\S\S").Value);
                     _actions.Add(new ShowsDownHand(actingPlayer, _actions.Last().Street, card1, card2, false));
                 }
                 else if (Regex.IsMatch(line, "^will be using his time bank"))
@@ -352,23 +353,23 @@ namespace PokerLib2.HandHistory
             }
             else if (Regex.IsMatch(line, @"^\*\* Dealing Flop"))
             {                
-                Card card1 = new Card(Regex.Match(line, @"(?<=\[\s+)\S+").Value);
-                Card card2 = new Card(Regex.Match(line, @"(?<=\[\s+\S\S )\S+").Value);
-                Card card3 = new Card(Regex.Match(line, @"(?<=\[\s+\S\S \S\S )\S+").Value);
+                Card card1 = new Card(Regex.Match(line, @"(?<=\[\s+)" + PokerRegex.rank + PokerRegex.suit).Value);
+                Card card2 = new Card(Regex.Match(line, @"(?<=\[\s+\S\S, )\S\S").Value);
+                Card card3 = new Card(Regex.Match(line, @"(?<=\[\s+\S\S, \S\S, )\S\S").Value);
                 _actions.Add(new DealFlop(card1, card2, card3));
             }
             else if (Regex.IsMatch(line, @"^\*\* Dealing Turn"))
             {
-                _actions.Add(new DealTurn(new Card(Regex.Match(line, @"(?<=\[\s+)\S+").Value)));
+                _actions.Add(new DealTurn(new Card(Regex.Match(line, @"(?<=\[\s+)\S\S").Value)));
             }
             else if (Regex.IsMatch(line, @"^\*\* Dealing River"))
             {
-                _actions.Add(new DealRiver(new Card(Regex.Match(line, @"(?<=\[\s+)\S+").Value)));
+                _actions.Add(new DealRiver(new Card(Regex.Match(line, @"(?<=\[\s+)\S\S").Value)));
             }            
             else if (Regex.IsMatch(line, @"^Dealt to"))
             {
-                Card card1 = new Card(Regex.Match(line, @"(?<=\[\s+)\S+").Value);
-                Card card2 = new Card(Regex.Match(line, @"(?<=\[\s+\S\S )\S+").Value);
+                Card card1 = new Card(Regex.Match(line, @"(?<=\[\s+)\S\S").Value);
+                Card card2 = new Card(Regex.Match(line, @"(?<=\[\s+\S\S )\S\S").Value);
                 _actions.Add(new DealHoleCards(card1, card2, _players[Regex.Match(line, @"(?<=\S+ \S+ )(\S+)").Value]));
             }
             else if (Regex.IsMatch(line, @"^Your time bank will be activated in \d+ secs"))
