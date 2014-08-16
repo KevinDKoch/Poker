@@ -15,7 +15,9 @@ namespace PokerLib2.Game
         public const string card = rank + suit;
         public const string hand = "(" + card + @")(?!\1)" + card; //([2-9TJQKA][cdhs])(?!\1)[2-9TJQKA][cdhs]
         public const string suitedness = @"[os]";
-        public const string shortHandFormat = @"((" + rank + @")(?!\2)" + rank + suitedness + ")|(" + rank + rank + @")";
+
+        //^([2-9TJQKA])(?!\1)[2-9TJQKA][os]$|^([2-9TJQKA])\2$
+        public const string shortHandFormat = @"^(" + rank + @")(?!\2)" + rank + suitedness + "$|^(" + rank + @")\2$";
 
         public const string weight = @"\(1\)|\((0?\.\d+)\)";
 

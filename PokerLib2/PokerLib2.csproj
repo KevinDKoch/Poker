@@ -56,6 +56,8 @@
     <Compile Include="RankAndSuit.cs" />
     <Compile Include="Stakes.cs" />
     <Compile Include="StartingHand.cs" />
+    <Compile Include="StartingHandData.cs" />
+    <Compile Include="StartingHandMatrix.cs" />
     <Compile Include="WeightedStartingHand.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
