@@ -35,7 +35,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MathNet.Numerics">
+      <HintPath>..\packages\MathNet.Numerics.3.2.1\lib\net40\MathNet.Numerics.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <Choose>
@@ -53,16 +57,21 @@
   <ItemGroup>
     <Compile Include="CardUnitTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StartingHandTests.cs" />
+    <Compile Include="StartingHandComboTests.cs" />
     <Compile Include="RangeTests.cs" />
     <Compile Include="EnumTests.cs" />
-    <Compile Include="WeightedStartingHandTests.cs" />
+    <Compile Include="StartingHandGridTests.cs" />
+    <Compile Include="StartingHandTest.cs" />
+    <Compile Include="WeightedStartingHandComboTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PokerLib2\PokerLib2.csproj">
       <Project>{aba326e6-bdc1-4316-b5be-929d6b696148}</Project>
       <Name>PokerLib2</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

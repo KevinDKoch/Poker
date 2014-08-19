@@ -7,19 +7,19 @@ using System.Text.RegularExpressions;
 
 namespace PokerLib2.Game
 {
-    public class WeightedStartingHand : StartingHand, IEquatable<WeightedStartingHand>
+    public class WeightedStartingHandCombo : StartingHandCombo, IEquatable<WeightedStartingHandCombo>
     {
         protected readonly double _weight;
         public double Weight { get { return _weight; } }
 
-        public WeightedStartingHand(Card firstCard, Card secondCard, double weight)
+        public WeightedStartingHandCombo(Card firstCard, Card secondCard, double weight)
             : base(firstCard, secondCard)
         {
             ValidateWeight(weight);
             _weight = weight;
         }
 
-        public WeightedStartingHand(string hand, double weight)
+        public WeightedStartingHandCombo(string hand, double weight)
             : base(hand)
         {
             ValidateWeight(weight);
@@ -38,7 +38,7 @@ namespace PokerLib2.Game
             }
         }
 
-        public WeightedStartingHand(string hand)
+        public WeightedStartingHandCombo(string hand)
             : base(TrimWeight(hand))
         {
             _weight = 1;
@@ -58,13 +58,13 @@ namespace PokerLib2.Game
             if (obj == null)
                 return false;
 
-            if (!(obj is WeightedStartingHand))
+            if (!(obj is WeightedStartingHandCombo))
                 return false;
 
-            return base.Equals((WeightedStartingHand)obj);
+            return base.Equals((WeightedStartingHandCombo)obj);
         }
 
-        public bool Equals(WeightedStartingHand other)
+        public bool Equals(WeightedStartingHandCombo other)
         {
             if ((Object)other == null)
                 return false;
@@ -80,29 +80,29 @@ namespace PokerLib2.Game
         /// </summary>
         /// <param name="other">The StartingHand being equated with.</param>
         /// <returns>True if equal, False otherwise.</returns>
-        public override bool Equals(StartingHand other)
+        public override bool Equals(StartingHandCombo other)
         {
             if ((base.Equals(other, MatchingMode.ExactSuits) == false))
                 return false;
 
-            if (other is WeightedStartingHand)
-                return Equals((WeightedStartingHand)other);
+            if (other is WeightedStartingHandCombo)
+                return _weight == ((WeightedStartingHandCombo)other).Weight;
 
             return _weight == 1;
         }
 
-        public override bool Equals(StartingHand other, MatchingMode mode, bool ignoreOrder = true)
+        public override bool Equals(StartingHandCombo other, MatchingMode mode, bool ignoreOrder = true)
         {
             if (base.Equals(other, mode, ignoreOrder) == false)
                 return false;
 
-            if (other is WeightedStartingHand)            
-                return Equals((WeightedStartingHand)other);
-            else
-                return _weight == 1;
+            if (other is WeightedStartingHandCombo)
+                return _weight == ((WeightedStartingHandCombo)other).Weight;
+            
+            return _weight == 1;
         }
 
-        public static bool operator ==(WeightedStartingHand left, WeightedStartingHand right)
+        public static bool operator ==(WeightedStartingHandCombo left, WeightedStartingHandCombo right)
         {
             if (ReferenceEquals(left, right))
                 return true;
@@ -112,7 +112,7 @@ namespace PokerLib2.Game
             return left.Equals(right);
         }
 
-        public static bool operator !=(WeightedStartingHand left, WeightedStartingHand right)
+        public static bool operator !=(WeightedStartingHandCombo left, WeightedStartingHandCombo right)
         {
             return !(left == right);
         }
@@ -124,9 +124,9 @@ namespace PokerLib2.Game
 
         protected void ValidateWeight(double weight)
         {
-            if (weight > 1 || weight <= 0)
+            if (weight > 1 || weight < 0)
             {
-                throw new ArgumentOutOfRangeException("The weight of a starting hand must be > 0 and <= 1.");
+                throw new ArgumentOutOfRangeException("The weight of a starting hand must be >= 0 and <= 1.");
             }
         }
         public override string ToString()

@@ -2,238 +2,73 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace PokerLib2.Game
 {
-    public class StartingHand : IEquatable<StartingHand>, IComparable<StartingHand>
-    {
-        protected readonly Card _firstCard;
-        protected readonly Card _secondCard;
+    /// <summary>
+    /// Represents a Range that has the same rank and suitedness.
+    /// </summary>
+    public class StartingHand : Range
+    {        
 
-        public  Card FirstCard { get { return _firstCard; } }
-        public  Card SecondCard { get { return _secondCard; } }
+        public String Name { get; private set; }
 
-        public Card HighCard 
-        { 
-            get 
-            {
-                //If it's a PP, then compare the suits instead of ranks
-                if (IsPocketPair())
-                    return (_secondCard.Suit > _firstCard.Suit) ? _secondCard : _firstCard; 
-                else                
-                    return (_secondCard.Rank > _firstCard.Rank) ? _secondCard : _firstCard;                                  
-            } 
-        }
+        public bool IsPocketPair { get; private set; }
+        public bool IsSuited { get; private set; }
 
-        public Card LowCard 
-        { 
-            get 
-            {
-                //If it's a PP, then compare the suits instead of ranks
-                if (IsPocketPair())
-                    return (_secondCard.Suit < _firstCard.Suit) ? _secondCard : _firstCard;
-                else               
-                    return (_secondCard.Rank <= _firstCard.Rank) ? _secondCard : _firstCard; 
-            } 
-        }
-
-        public enum MatchingMode { ExactSuits, Suitedness, RankOnly }
-
-        public StartingHand(Card firstCard, Card secondCard)
-        {
-            ValidateCards(firstCard, secondCard);
-            _firstCard = firstCard;
-            _secondCard = secondCard;
-        }
-
-        public StartingHand(string hand)
-        {
-            if (hand == null) 
-                throw new ArgumentNullException(hand, "The starting hand cannot be null.");
-
-            if (hand == string.Empty)
-                throw new ArgumentException(hand, "The starting hand cannot be an empty string.");
-
-            if (hand.Length != 4) 
-                throw new ArgumentException(hand, "The starting hand must be 4 letters long:" + hand);
-            
-            if (Regex.IsMatch(hand, PokerRegex.hand) == false)
-                throw new ArgumentException(hand, "The format of the starting hand was not recognized:" + hand);
-                      
-            Card firstCard = new Card(hand.Substring(0, 2));
-            Card secondCard = new Card(hand.Substring(2,2));
-            ValidateCards(firstCard, secondCard);
-
-            _firstCard = firstCard;
-            _secondCard = secondCard;
-        }
-
-        protected void ValidateCards(Card firstCard, Card secondCard)
-        {
-            if (firstCard.Equals(secondCard))
-                throw new ArgumentException("A starting hand must contain two unique cards.");
-
-        }
-            
-        public bool IsSuited()
-        {
-            return (_firstCard.Suit == _secondCard.Suit);
-        }
-
-        public int Gap()
-        {
-            return Math.Abs(_firstCard.Rank - _secondCard.Rank);
-        }
-
-        public bool IsPocketPair()
-        {
-            return (_firstCard.Rank == _secondCard.Rank);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if ((Object)obj == null)
-                return false;
-
-            return Equals(obj as StartingHand);
-        }
-
-        public virtual bool Equals(StartingHand hand)
-        {
-            if ((Object)hand == null)
-                return false;
-
-            return Equals(hand, MatchingMode.ExactSuits, true);
-        }
-        
-        /// <summary>
-        /// Determines if this StartingHand has the same value as another StartingHand with the selected matching mode.
-        /// </summary>
-        /// <param name="hand">Hand to be compared to.</param>
-        /// <param name="mode"><para>If ExactSuits then AsKc != AcKs.</para>
-        /// <para>If Suitedness then AKs == AKs, AKo == AKo, 99 == 99, but AKs != AKo.</para>
-        /// If RankOnly then AsKs == KcAh.</param>
-        /// <param name="ignoreOrder">If true, AK == KA.</param>
-        /// <returns>True if the hands are equal using the selected matching mode.</returns>
-        public virtual bool Equals(StartingHand hand, MatchingMode mode, bool ignoreOrder = true)
-        {            
-            if ((Object)hand == null) return false;
-            
-            //Matching mode not recognized
-            if (Enum.IsDefined(typeof(MatchingMode), mode) == false) return false;
-            
-            bool exactMatch = ((_firstCard.Equals(hand.FirstCard) && _secondCard.Equals(hand.SecondCard)) ||
-                (ignoreOrder && _firstCard.Equals(hand.SecondCard) && _secondCard.Equals(hand.FirstCard)));
-
-            if (exactMatch) return true;
-
-            bool rankMatch = (hand.FirstCard.Rank == _firstCard.Rank && hand.SecondCard.Rank == _secondCard.Rank) ||
-              (ignoreOrder && hand.FirstCard.Rank == _secondCard.Rank && hand.SecondCard.Rank == _firstCard.Rank);
-
-            //The ranks must always be equal
-            if (rankMatch == false) return false;
-
-            //AKo == AKs
-            if (mode == MatchingMode.RankOnly) return rankMatch;
-
-            //AKo != AKs
-            if (mode == MatchingMode.Suitedness) return (hand.IsSuited() == this.IsSuited());
-
-            return false;
-        }
-
-        public override int GetHashCode()
-        {
-            //return HighCard.GetHashCode() ^ LowCard.GetHashCode();//AsKc equals KcAs so hash equality is correct
-            return SortValue();
-        }
-
-        public static bool operator ==(StartingHand left, StartingHand right)
-        {
-            if (ReferenceEquals(left, right))
-                return true;
-            if (ReferenceEquals(left, null))
-                return false;
-
-            return (left.HighCard == right.HighCard && left.LowCard == right.LowCard);
-        }
-
-        public static bool operator !=(StartingHand left, StartingHand right)
-        {
-            return !(left == right);
-        }
-
-        
-        /// <summary>
-        /// Returns a unique value for each starting hand which ignores card order, and can be used for sorting.
-        /// <para>Format RRrrSs</para>
-        /// <para>AcKs == 131214 because A == 13, K == 12, c == 1, s == 4</para>
-        /// </summary>
-        /// <returns>A value to be used for sorting.</returns>
-        protected int SortValue()
-        {            
-            return (int)this.HighCard.Rank * 10000 +
-                   (int)this.LowCard.Rank * 100 +
-                   (int)this.HighCard.Suit * 10 + 
-                   (int)this.LowCard.Suit;
-        }
-
-        public int CompareTo(StartingHand other)
-        {
-            if (this.Equals(other, MatchingMode.ExactSuits, true))
-                return 0;
+        public Rank HighRank { get; private set; }
+        public Rank LowRank { get; private set; }
    
-            return (this.SortValue() > other.SortValue()) ? 1 : -1;                                          
-        }
-
-        public static bool operator >(StartingHand left, StartingHand right)
-        {            
-            return left.CompareTo(right) == 1;
-        }
-        
-        public static bool operator <(StartingHand left, StartingHand right)
+        public StartingHand(string startingHand)
+            : base(startingHand)
         {
-            return left.CompareTo(right) == -1;
-        }
+            if (_combos.Count == 0)
+                throw new ArgumentException("StartingHand must be created with combos.");
 
-        public static bool operator <=(StartingHand left, StartingHand right)
-        {
-            return left.CompareTo(right) <= 0;
-        }
+            Name = _combos[0].ToString(true, true);
 
-        public static bool operator >=(StartingHand left, StartingHand right)
-        {
-            return left.CompareTo(right) >= 0;
-        }
+            IsPocketPair = _combos[0].IsPocketPair();
+            IsSuited = _combos[0].IsSuited();
 
-        public override string ToString()
-        {
-            return this.ToString(false);
-        }
+            HighRank = _combos[0].HighCard.Rank;
+            LowRank = _combos[0].LowCard.Rank;
 
-        public virtual string ToString(bool shortFormat, bool sorted = false)
-        {
-            string handName;
-            if (sorted)
-                handName = this.HighCard.ToString() + this.LowCard.ToString();
-            else
-                handName = _firstCard.ToString() + _secondCard.ToString();
+            foreach (WeightedStartingHandCombo c in _combos)
+                if (!c.Equals(_combos[0], StartingHandCombo.MatchingMode.Suitedness, true))
+                    throw new ArgumentException("All combos of a StartingHand must have that same ranks and suitedness:" + _combos[0].ToString(true, true) + "!=" + c.ToString(true, true));
             
-            //AcKh == "AKo", KsAs == "AKs", 9s9h == "99"
-            if (shortFormat)
-            {
-                handName = this.HighCard.ToString().Substring(0, 1) + this.LowCard.ToString().Substring(0, 1);
-
-                if (this.IsSuited())
-                    handName += "s";
-                else if (this.IsPocketPair() == false)
-                    handName += "o";                
-            }
-
-            return handName;
         }
+
+
+        /// <summary>
+        /// Adds a combo to the range.  If a combo already exists, it is overwritten (with a potentially new weight).  If the combo is part of this starting hand, then a exception is thrown.
+        /// </summary>
+        /// <param name="combo">The combo to add.</param>
+        public override void Add(WeightedStartingHandCombo combo)
+        {
+            if (combo.HighCard.Rank == this.HighRank &&
+                combo.LowCard.Rank == this.LowRank &&
+                combo.IsSuited() == this.IsSuited)
+            {
+                AddCombo(combo);
+            }
+            else
+            {
+                throw new ArgumentException("All combos of a StartingHand must have that same ranks and suitedness:" + _combos[0].ToString(true, true) + "!=" + combo.ToString(true, true));
+            }            
+        }
+
+        /// <summary>
+        /// Adds a range of combos which will overwrite existing combo's if they are valid combo's of this starting hand.
+        /// </summary>
+        /// <param name="items">The range to add.</param>
+        public override void AddRange(Range combos)
+        {
+            foreach (WeightedStartingHandCombo hand in combos)
+            {                
+                this.Add(hand);
+            }
+        }   
     }
-    
 }

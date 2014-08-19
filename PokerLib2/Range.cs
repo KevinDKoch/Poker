@@ -8,29 +8,21 @@ using System.Threading.Tasks;
 
 namespace PokerLib2.Game
 {
-    public class Range:IList<WeightedStartingHand>, IEquatable<Range>
+    public class Range: IEquatable<Range>
     {
-        protected List<WeightedStartingHand> hands = new List<WeightedStartingHand>();
-        public List<WeightedStartingHand> Hands { get { return this.hands; } set { this.hands = value; } }
+        protected List<WeightedStartingHandCombo> _combos = new List<WeightedStartingHandCombo>();
 
-        public string RangeString { get; private set; }
-
-        public Range(List<WeightedStartingHand> hands)
-        {            
-            this.hands = hands;
-        }
-
+        public Range() { }
+        
         public Range(string range)
         {
-
             if(ReferenceEquals(range, null))
                 throw new ArgumentNullException(range, "range cannot be null.");
 
             StringBuilder errMsg = new StringBuilder();
-            if (IsValidRange(range) == false)            
+            if (IsValidRange(range, errMsg) == false)            
                 throw new ArgumentException("Invalid Range: " + errMsg + ":" + range);
-
-            this.RangeString = range;
+            
             range = range.TrimStart('{').TrimEnd('}');
             range = Regex.Replace(range, @"\s", String.Empty);
             string[] tokens = range.Split(',');
@@ -49,7 +41,7 @@ namespace PokerLib2.Game
                                 
                 if (Regex.IsMatch(hand, PokerRegex.RangeGroups.singleHand ))
                 {
-                    this.Add(new WeightedStartingHand(hand));
+                    this.AddCombo(new WeightedStartingHandCombo(hand));
                 }
                 else if ((Regex.IsMatch(hand, PokerRegex.RangeGroups.handGroup)) || //Ex: AK,AKs,99  
                          (Regex.IsMatch(hand, PokerRegex.RangeGroups.wildGroup)))   //Ex: A*, *A, **, A*s, *Ao, **s
@@ -80,15 +72,15 @@ namespace PokerLib2.Game
                                     Card second = new Card(secondRank, s2);
                                     if (first.Equals(second) == false)
                                     {
-                                        WeightedStartingHand newHand = new WeightedStartingHand(first, second, weight);
-                                        if (this.hands.Contains(newHand) == false)
+                                        WeightedStartingHandCombo newHand = new WeightedStartingHandCombo(first, second, weight);
+                                        if (_combos.Contains(newHand) == false)
                                         {                   
                                             //Filter for suitedness
                                             if ((hand.EndsWith("s") && newHand.IsSuited()) ||
                                                (hand.EndsWith("o") && !newHand.IsSuited() && newHand.FirstCard.Rank != newHand.SecondCard.Rank) || //PP's are offsuit, but can't be written as 99o
                                                (!Regex.IsMatch(hand, PokerRegex.suitedness))) //Groups that don't filter for suitedness
                                             {                                                
-                                                this.Add(newHand);
+                                                this.AddCombo(newHand);
                                             }
                                         }
                                     }
@@ -100,10 +92,10 @@ namespace PokerLib2.Game
                 else if (Regex.IsMatch(hand, PokerRegex.RangeGroups.closedLinear))
                 {                    
                     //Start with first hand group, then determine direction and iterate to the end hand group
-                    StartingHand startHand = new StartingHand(hand[0] + "c" + hand[1] + "s");
+                    StartingHandCombo startHand = new StartingHandCombo(hand[0] + "c" + hand[1] + "s");
                     string endHandStr = Regex.Match(hand, @"(?<=-).*").Value;
-                    StartingHand endHand = new StartingHand(endHandStr[0] + "c" + endHandStr[1] + "s");                    
-                    StartingHand temp = endHand;
+                    StartingHandCombo endHand = new StartingHandCombo(endHandStr[0] + "c" + endHandStr[1] + "s");                    
+                    StartingHandCombo temp = endHand;
 
                     //The start point should be the higher ranking group
                     if (startHand.HighCard.Rank < endHand.HighCard.Rank)
@@ -120,8 +112,8 @@ namespace PokerLib2.Game
                     
                     //Starting with the larger ranking hand, traverse to the ending hand.
                     //Movement will be down, left-to-right, or diagonally down and right.
-                    StartingHand curHand = startHand;
-                    StartingHand prevHand = curHand;
+                    StartingHandCombo curHand = startHand;
+                    StartingHandCombo prevHand = curHand;
                     int verticalStep = (startHand.HighCard.Rank == endHand.HighCard.Rank) ? 0 : -1;
                     int horizontalStep = (startHand.LowCard.Rank == endHand.LowCard.Rank) ? 0 : -1;
                     do
@@ -129,7 +121,7 @@ namespace PokerLib2.Game
                         Range newHands = new Range(curHand.HighCard.Rank.ToLetter() +
                                                    curHand.LowCard.Rank.ToLetter() +
                                                    suitedness + "(" + weight.ToString() + ")");
-                        this.AddRange(newHands.Hands);
+                        this.AddRangeOfCombos(newHands);
 
                         //Get the next hand group
                         Rank nextHiRank = curHand.HighCard.Rank + verticalStep;
@@ -138,7 +130,7 @@ namespace PokerLib2.Game
                         //Make sure the next hand is possible
                         if (Enum.IsDefined(typeof(Rank) , nextHiRank)==false || Enum.IsDefined(typeof(Rank), nextLoRank) == false) 
                             break;
-                        curHand = new StartingHand(nextHiRank.ToLetter() + "c" + nextLoRank.ToLetter() + "s");
+                        curHand = new StartingHandCombo(nextHiRank.ToLetter() + "c" + nextLoRank.ToLetter() + "s");
                     } while (prevHand.Equals(endHand) == false);
 
                 }//22+, 76+, JTs+, TT-, 76-, AKo-
@@ -146,7 +138,7 @@ namespace PokerLib2.Game
                 {
                     //Determine the end hand group and recursively call the range constuctor using the closedLinear format
                     //Ex: TT+ == AA-TT
-                    StartingHand startHand = new StartingHand(hand[0] + "c" + hand[1] + "d");
+                    StartingHandCombo startHand = new StartingHandCombo(hand[0] + "c" + hand[1] + "d");
                     Range newHands = null;
                     if (hand.EndsWith("+"))
                     {
@@ -156,7 +148,7 @@ namespace PokerLib2.Game
                         else//Ex: 76s+
                             newHands = new Range(hand[0].ToString() + hand[1].ToString() + suitedness + "-A" + ('A'.ToRank() - startHand.Gap()).ToLetter() + suitedness + "(" + weight + ")");
 
-                        this.AddRange(newHands.Hands);
+                        this.AddRangeOfCombos(newHands);
                     }
                     else
                     {
@@ -166,7 +158,7 @@ namespace PokerLib2.Game
                         else//76s-
                             newHands = new Range(hand[0] + hand[1] + suitedness + "-2" + ('2'.ToRank() + startHand.Gap()).ToLetter() + suitedness + "(" + weight + ")");
 
-                        this.AddRange(newHands.Hands);
+                        this.AddRangeOfCombos(newHands);
                     }                                       
                 }
             }
@@ -180,11 +172,14 @@ namespace PokerLib2.Game
         /// <returns>True if the range is valid.</returns>
         public static bool IsValidRange(string range, StringBuilder errorMsg = null)
         {
-            if (string.IsNullOrEmpty(range))
+            if (range == null)
             {
-                errorMsg.Append("Range cannot be null or empty.");
+                errorMsg.Append("Range cannot be null.");
                 return false;   
             }
+
+            if (range == string.Empty || range == "{}")
+                return true;
                 
             if(errorMsg == null) errorMsg = new StringBuilder();
 
@@ -195,9 +190,8 @@ namespace PokerLib2.Game
                 return false;
             }
                 
-            range = range.TrimStart('{').TrimEnd('}');            
-            range = Regex.Replace(range, @"\s", String.Empty);
-            
+            range = range.TrimStart('{').TrimEnd('}');           
+            range = Regex.Replace(range, @"\s", String.Empty);            
             foreach (string token in range.Split(','))
             {
                 foundMatch = false; //Reset for this next token
@@ -258,9 +252,9 @@ namespace PokerLib2.Game
                 //Ex: AA-TT, JTs-76s, JT-AK
                 if (Regex.IsMatch(hand, PokerRegex.RangeGroups.closedLinear))
                 {                    
-                    StartingHand startHand = new StartingHand(hand[0] + "c" + hand[1] + "s");
+                    StartingHandCombo startHand = new StartingHandCombo(hand[0] + "c" + hand[1] + "s");
                     string endHandStr = Regex.Match(hand, @"(?<=-).*").Value;
-                    StartingHand endHand = new StartingHand(endHandStr[0] + "c" + endHandStr[1] + "s");
+                    StartingHandCombo endHand = new StartingHandCombo(endHandStr[0] + "c" + endHandStr[1] + "s");
 
                     //Do the hand groups make a line?
                     if ((startHand.HighCard.Rank == endHand.HighCard.Rank || startHand.LowCard.Rank == endHand.LowCard.Rank) || //Horizontal and Vertical
@@ -296,11 +290,11 @@ namespace PokerLib2.Game
         /// <para>AKs(.5) = 2 combos</para>
         /// </summary>
         /// <returns>The number of combinations after adjusting for weight.</returns>
-        public double Combos()
+        public double WeightedCount()
         {
             double totalCombos = 0;
 
-            foreach (WeightedStartingHand hand in this.hands)
+            foreach (WeightedStartingHandCombo hand in _combos)
             {
                 totalCombos += hand.Weight;
             }
@@ -316,7 +310,7 @@ namespace PokerLib2.Game
         public string ToString(bool highCardsFirst)
         {
             string rangeStr = "{";
-            foreach (WeightedStartingHand hand in this.hands)
+            foreach (WeightedStartingHandCombo hand in _combos)
             {
                 rangeStr += hand.ToString(false, highCardsFirst);
                 rangeStr += ",";
@@ -326,6 +320,8 @@ namespace PokerLib2.Game
             return rangeStr;
         }
 
+
+        //TODO: Implement GetHashCode()
         public override bool Equals(object obj)
         {
             if (obj == null)
@@ -342,117 +338,101 @@ namespace PokerLib2.Game
             if ((Object)other == null)
                 return false;
 
-            if(this.hands.Count != other.Count)
+            if(_combos.Count != other.Count)
                 return false;
 
-            foreach (WeightedStartingHand hand in other.Hands)
+            foreach (WeightedStartingHandCombo hand in other)
             {
-                if (this.Hands.Contains(hand) == false)
+                if (this.Contains(hand) == false)
                     return false;
             }
 
             return true;
         }        
 
-#region IList Implementation
-
-        public int IndexOf(WeightedStartingHand item)
-        {
-            return this.hands.IndexOf(item);
-        }
-
-        public void Insert(int index, WeightedStartingHand item)
-        {
-            this.hands.Insert(index, item);
-        }
-
-        public void RemoveAt(int index)
-        {
-            this.hands.RemoveAt(index);
-        }
-
-        public WeightedStartingHand this[int index]
+        public WeightedStartingHandCombo this[int index]
         {
             get
             {
-                return this.hands[index];
-            }
-            set
-            {
-                this.hands[index] = value;
+                return _combos[index];
             }
         }
 
         public void Clear()
         {
-            this.hands.Clear();
+            _combos.Clear();
         }
 
-        public bool Contains(WeightedStartingHand item)
+        public bool Contains(WeightedStartingHandCombo item)
         {
-            return this.hands.Contains(item);            
+            return _combos.Contains(item);            
         }
 
-        public void CopyTo(WeightedStartingHand[] array, int arrayIndex)
+        public void CopyTo(WeightedStartingHandCombo[] array, int arrayIndex)
         {
-            this.hands.CopyTo(array, arrayIndex);
+            _combos.CopyTo(array, arrayIndex);
         }
-
+        
         public int Count
         {
-            get {return this.hands.Count;}
+            get {return _combos.Count;}
         }
 
-        public bool IsReadOnly
+        public bool Remove(WeightedStartingHandCombo item)
         {
-            get { return ((IList<WeightedStartingHand>)this.hands).IsReadOnly; }
+            return _combos.Remove(item);
         }
 
-        public bool Remove(WeightedStartingHand item)
+        public IEnumerator<WeightedStartingHandCombo> GetEnumerator()
         {
-            return this.hands.Remove(item);
+            return _combos.GetEnumerator();
         }
 
-        public IEnumerator<WeightedStartingHand> GetEnumerator()
-        {
-            return this.hands.GetEnumerator();
-        }
+        //System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        //{
+        //    return GetEnumerator();
+        //}
 
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
 
-        /// <summary>
-        /// Adds a WeightedStartingHand to the range.  If a hand already exists, it is overwritten (with a potentially new weight).
-        /// </summary>
-        /// <param name="item">The hand to add.</param>
-        public void Add(WeightedStartingHand item)
+        //Non-virtual method to add combo's without potentially calling a derived Add
+        protected void AddCombo(WeightedStartingHandCombo combo)
         {
-            foreach (WeightedStartingHand h in this.hands)
-            {                                
-                if (((StartingHand)h) == ((StartingHand)item))
-                {                    
-                    this.hands.Remove(h);
+            foreach (WeightedStartingHandCombo h in _combos)
+            {
+                if (((StartingHandCombo)h) == ((StartingHandCombo)combo))
+                {
+                    _combos.Remove(h);
                     break;
                 }
             }
-            
-            this.hands.Add(item);
+
+            _combos.Add(combo);
         }
 
         /// <summary>
-        /// Adds a list of WeightStartingHands.  If a hand already exists, it is overwritten (with a potentially new weight).
+        /// Adds a combo to the range.  If a combo already exists, it is overwritten (with a potentially new weight).
         /// </summary>
-        /// <param name="items">The range to add.</param>
-        public void AddRange(List<WeightedStartingHand> items)
+        /// <param name="combo">The combo to add.</param>
+        public virtual void Add(WeightedStartingHandCombo combo)
         {
-            foreach (WeightedStartingHand hand in items)
+            AddCombo(combo);
+        }
+
+        protected void AddRangeOfCombos(Range combos)
+        {
+            foreach (WeightedStartingHandCombo hand in combos)
             {
                 this.Add(hand);
             }
         }
-    }
 
-    #endregion    
+        /// <summary>
+        /// Adds a range.  If a combo already exists, it is overwritten (with a potentially new weight).
+        /// </summary>
+        /// <param name="combos">The range to add.</param>
+        public virtual void AddRange(Range combos)
+        {
+            AddRangeOfCombos(combos);
+        }
+    }
 }

@@ -30,8 +30,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MathNet.Numerics">
+      <HintPath>..\PokerReports\packages\MathNet.Numerics.3.2.1\lib\net40\MathNet.Numerics.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -56,9 +60,13 @@
     <Compile Include="RankAndSuit.cs" />
     <Compile Include="Stakes.cs" />
     <Compile Include="StartingHand.cs" />
+    <Compile Include="StartingHandCombo.cs" />
     <Compile Include="StartingHandData.cs" />
-    <Compile Include="StartingHandMatrix.cs" />
-    <Compile Include="WeightedStartingHand.cs" />
+    <Compile Include="StartingHandGrid.cs" />
+    <Compile Include="WeightedStartingHandCombo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

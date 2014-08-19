@@ -11,16 +11,16 @@ using PokerLib2.HandHistory;
 namespace PokerLib2Tests
 {
     [TestClass]
-    public class StartingHandTest
+    public class StartingHandComboTest
     {
-        private static Dictionary<string, StartingHand> _startingHandCombos;
-        private static Dictionary<string, StartingHand> _startingHandPermutations;
+        private static Dictionary<string, WeightedStartingHandCombo> _startingHandCombos;
+        private static Dictionary<string, WeightedStartingHandCombo> _startingHandPermutations;
 
         [ClassInitialize()]
         public static void ClassInit(TestContext context)
         {
-            _startingHandCombos = new Dictionary<string, StartingHand>();
-            _startingHandPermutations = new Dictionary<string, StartingHand>();
+            _startingHandCombos = new Dictionary<string, WeightedStartingHandCombo>();
+            _startingHandPermutations = new Dictionary<string, WeightedStartingHandCombo>();
 
             //All starting hands match a regular expression after ToString is called
             List<Card> cards = new List<Card>();
@@ -36,11 +36,11 @@ namespace PokerLib2Tests
             {
                 for (int iSecondCard = iFirstCard + 1; iSecondCard < 52; iSecondCard++)
                 {
-                    StartingHand hand = new StartingHand(cards[iFirstCard], cards[iSecondCard]);
+                    WeightedStartingHandCombo hand = new WeightedStartingHandCombo(cards[iFirstCard], cards[iSecondCard], 1);
                     _startingHandCombos.Add(hand.ToString(false), hand);
                     _startingHandPermutations.Add(hand.ToString(), hand);
 
-                    StartingHand handOppOrder = new StartingHand(cards[iSecondCard], cards[iFirstCard]);
+                    WeightedStartingHandCombo handOppOrder = new WeightedStartingHandCombo(cards[iSecondCard], cards[iFirstCard], 1);
                     _startingHandPermutations.Add(handOppOrder.ToString(), handOppOrder);
                 }
             }
@@ -53,21 +53,21 @@ namespace PokerLib2Tests
         [ExpectedException(typeof(ArgumentException))]
         public void Constructor_DuplicateCards_Throws()
         {
-            StartingHand hand = new StartingHand(new Card(Rank.Ace, Suit.Diamonds), new Card("AsKd"));
+            StartingHandCombo hand = new StartingHandCombo(new Card(Rank.Ace, Suit.Diamonds), new Card("AsKd"));
         }
 
         [TestMethod]        
         [ExpectedException(typeof(ArgumentException))]
         public void Constructor_EmptyString_Throws()
         {
-            StartingHand hand = new StartingHand("");
+            StartingHandCombo hand = new StartingHandCombo("");
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void Constructor_NullInsteadofString_Throws()
         {
-            StartingHand hand = new StartingHand(null);
+            StartingHandCombo hand = new StartingHandCombo(null);
         }
 
         [TestMethod]        
@@ -114,7 +114,7 @@ namespace PokerLib2Tests
         {
             try
             {
-                StartingHand hand = new StartingHand(test);
+                StartingHandCombo hand = new StartingHandCombo(test);
                 Assert.Fail("This hand should have thrown an exception:" + test);
             }
             catch (ArgumentException e)
@@ -126,14 +126,14 @@ namespace PokerLib2Tests
         [TestMethod]
         public void Gap_TestGapsForVariousHands_Passes()
         {
-            Assert.AreEqual(0, new StartingHand("9s9c").Gap());
-            Assert.AreEqual(1, new StartingHand("7s6c").Gap());
-            Assert.AreEqual(1, new StartingHand("6s7c").Gap());
+            Assert.AreEqual(0, new StartingHandCombo("9s9c").Gap());
+            Assert.AreEqual(1, new StartingHandCombo("7s6c").Gap());
+            Assert.AreEqual(1, new StartingHandCombo("6s7c").Gap());
 
-            Assert.AreEqual(5, new StartingHand("7s2c").Gap());
-            Assert.AreEqual(2, new StartingHand("AsQc").Gap());
-            Assert.AreEqual(5, new StartingHand("2s7c").Gap());
-            Assert.AreEqual(2, new StartingHand("QsAc").Gap());
+            Assert.AreEqual(5, new StartingHandCombo("7s2c").Gap());
+            Assert.AreEqual(2, new StartingHandCombo("AsQc").Gap());
+            Assert.AreEqual(5, new StartingHandCombo("2s7c").Gap());
+            Assert.AreEqual(2, new StartingHandCombo("QsAc").Gap());
 
         }
 
@@ -144,7 +144,7 @@ namespace PokerLib2Tests
             Regex startingHandLongName = new Regex(@"^[2-9,A,K,Q,J,T][c,d,h,s][2-9,A,K,Q,J,T][c,d,h,s]$");
             Regex startingHandShortName = new Regex(@"^([2-9,A,K,Q,J,T][2-9,A,K,Q,J,T][o,s]$)|([22,33,44,55,66,77,88,99,TT,JJ,QQ,KK,AA]$)");
 
-            foreach (StartingHand hand in _startingHandCombos.Values)
+            foreach (StartingHandCombo hand in _startingHandCombos.Values)
             {
                 Assert.IsTrue(startingHandLongName.IsMatch(hand.ToString()), "Incorrect Hand Long Format found in Combos:"+hand.ToString());
                 Assert.IsTrue(startingHandLongName.IsMatch(hand.ToString(false)), "Incorrect Hand Long Format found in Combos:" + hand.ToString(false));
@@ -153,7 +153,7 @@ namespace PokerLib2Tests
                 //Verify order in short format
                 if(hand.SecondCard.Rank > hand.FirstCard.Rank)
                 {
-                    StartingHand orderedHand = new StartingHand(hand.SecondCard, hand.FirstCard);
+                    StartingHandCombo orderedHand = new StartingHandCombo(hand.SecondCard, hand.FirstCard);
 
                     //First card should be bigger then the second
                     Assert.IsTrue(hand.ToString(true).Substring(0, 1) == orderedHand.FirstCard.ToString().Substring(0, 1));
@@ -166,7 +166,7 @@ namespace PokerLib2Tests
                 }                
             }
 
-            foreach (StartingHand hand in _startingHandPermutations.Values)
+            foreach (StartingHandCombo hand in _startingHandPermutations.Values)
             {
                 Assert.IsTrue(startingHandLongName.IsMatch(hand.ToString()), "Incorrect Hand Long Format found in Permutations:" + hand.ToString());
                 Assert.IsTrue(startingHandLongName.IsMatch(hand.ToString(false)), "Incorrect Hand Long Format found in Permutations:" + hand.ToString(false));
@@ -175,7 +175,7 @@ namespace PokerLib2Tests
                 //Verify order in simple format
                 if (hand.SecondCard.Rank >= hand.FirstCard.Rank)
                 {
-                    StartingHand orderedHand = new StartingHand(hand.SecondCard, hand.FirstCard);
+                    StartingHandCombo orderedHand = new StartingHandCombo(hand.SecondCard, hand.FirstCard);
 
                     //First card should be bigger then the second
                     Assert.IsTrue(hand.ToString(true).Substring(0, 1) == orderedHand.FirstCard.ToString().Substring(0, 1));
@@ -192,7 +192,7 @@ namespace PokerLib2Tests
         [TestMethod]
         public void Equals_EveryStartingHandHasCorrectMatchesForAllMatchingModesAndOrders_Passes()
         {
-            foreach (StartingHand hand1 in _startingHandPermutations.Values)
+            foreach (StartingHandCombo hand1 in _startingHandPermutations.Values)
             {
                 int exactMatches = 0;
                 int suitednessMatches = 0;
@@ -202,18 +202,18 @@ namespace PokerLib2Tests
                 int orderedSuitednessMatches = 0;
                 int orderedRankMatches = 0;
 
-                foreach (StartingHand hand2 in _startingHandPermutations.Values)
+                foreach (StartingHandCombo hand2 in _startingHandPermutations.Values)
                 {
-                    exactMatches += (hand1.Equals(hand2, StartingHand.MatchingMode.ExactSuits)) ? 1 : 0;
-                    suitednessMatches += (hand1.Equals(hand2, StartingHand.MatchingMode.Suitedness)) ? 1 : 0;
-                    rankMatches += (hand1.Equals(hand2, StartingHand.MatchingMode.RankOnly)) ? 1 : 0;
+                    exactMatches += (hand1.Equals(hand2, StartingHandCombo.MatchingMode.ExactSuits)) ? 1 : 0;
+                    suitednessMatches += (hand1.Equals(hand2, StartingHandCombo.MatchingMode.Suitedness)) ? 1 : 0;
+                    rankMatches += (hand1.Equals(hand2, StartingHandCombo.MatchingMode.RankOnly)) ? 1 : 0;
 
-                    orderedExactMatches += (hand1.Equals(hand2, StartingHand.MatchingMode.ExactSuits, false)) ? 1 : 0;                    
-                    if(hand1.Equals(hand2, StartingHand.MatchingMode.Suitedness, false))
+                    orderedExactMatches += (hand1.Equals(hand2, StartingHandCombo.MatchingMode.ExactSuits, false)) ? 1 : 0;                    
+                    if(hand1.Equals(hand2, StartingHandCombo.MatchingMode.Suitedness, false))
                     {
                         orderedSuitednessMatches += 1;
                     }
-                    orderedRankMatches += (hand1.Equals(hand2, StartingHand.MatchingMode.RankOnly, false)) ? 1 : 0;
+                    orderedRankMatches += (hand1.Equals(hand2, StartingHandCombo.MatchingMode.RankOnly, false)) ? 1 : 0;
 
                 }
 
@@ -249,42 +249,42 @@ namespace PokerLib2Tests
         [TestMethod]
         public void Equals_Null_Test()
         {
-            Assert.IsFalse(new StartingHand(new Card("As"), new Card("Ks")).Equals(null));
-            Assert.IsFalse(new StartingHand(new Card("As"), new Card("Ks")).Equals(new Card("As")));
-            Assert.IsFalse(new StartingHand(new Card("As"), new Card("Ks")).Equals(new StartingHand(new Card("As"), new Card("Ks")),(StartingHand.MatchingMode)9));
+            Assert.IsFalse(new StartingHandCombo(new Card("As"), new Card("Ks")).Equals(null));
+            Assert.IsFalse(new StartingHandCombo(new Card("As"), new Card("Ks")).Equals(new Card("As")));
+            Assert.IsFalse(new StartingHandCombo(new Card("As"), new Card("Ks")).Equals(new StartingHandCombo(new Card("As"), new Card("Ks")),(StartingHandCombo.MatchingMode)9));
         }
 
         [TestMethod]
         public void ToString_CreatesExactOrderedOrginalHands_Passes()
         {
-            foreach (StartingHand hand in _startingHandPermutations.Values)
+            foreach (StartingHandCombo hand in _startingHandPermutations.Values)
             {
-                StartingHand handFromString = new StartingHand(hand.ToString());
-                Assert.IsTrue(hand.Equals(handFromString, StartingHand.MatchingMode.ExactSuits, true), "The hand created from ToString was not an exact match");
+                StartingHandCombo handFromString = new StartingHandCombo(hand.ToString());
+                Assert.IsTrue(hand.Equals(handFromString, StartingHandCombo.MatchingMode.ExactSuits, true), "The hand created from ToString was not an exact match");
             }
         }
 
         [TestMethod]
         public void ComparisonOperators_CommonUsageWorksAsExpected_Passes()
         {
-            Assert.IsTrue(new StartingHand("7s3c") > new StartingHand("2s7c"));
-            Assert.IsTrue(new StartingHand("7s2c") < new StartingHand("3s7c"));
+            Assert.IsTrue(new StartingHandCombo("7s3c") > new StartingHandCombo("2s7c"));
+            Assert.IsTrue(new StartingHandCombo("7s2c") < new StartingHandCombo("3s7c"));
 
-            Assert.IsFalse(new StartingHand("7s2c") < new StartingHand("7c2s"));
-            Assert.IsFalse(new StartingHand("AsKc") < new StartingHand("7c2s"));
+            Assert.IsFalse(new StartingHandCombo("7s2c") < new StartingHandCombo("7c2s"));
+            Assert.IsFalse(new StartingHandCombo("AsKc") < new StartingHandCombo("7c2s"));
 
-            Assert.IsTrue(new StartingHand("9s9h") > new StartingHand("9s9c"));
-            Assert.IsTrue(new StartingHand("7s2c") < new StartingHand("3s7c"));
+            Assert.IsTrue(new StartingHandCombo("9s9h") > new StartingHandCombo("9s9c"));
+            Assert.IsTrue(new StartingHandCombo("7s2c") < new StartingHandCombo("3s7c"));
         }
 
         [TestMethod]
         public void CompareTo_ValidateSortingForAllPerms_Passes()
         {
-            List<StartingHand> copy = new List<StartingHand>();
-            List<StartingHand> sorted = new List<StartingHand>();
-            List<StartingHand> shuffled = new List<StartingHand>();
+            List<StartingHandCombo> copy = new List<StartingHandCombo>();
+            List<StartingHandCombo> sorted = new List<StartingHandCombo>();
+            List<StartingHandCombo> shuffled = new List<StartingHandCombo>();
 
-            foreach (StartingHand h in _startingHandPermutations.Values)
+            foreach (StartingHandCombo h in _startingHandPermutations.Values)
             {
                 copy.Add(h);
                 sorted.Add(h);       
@@ -305,14 +305,14 @@ namespace PokerLib2Tests
             Assert.IsTrue(EqualLists(sorted, shuffled));
         }
 
-        public bool EqualLists(List<StartingHand> listA, List<StartingHand> listB)
+        public bool EqualLists(List<StartingHandCombo> listA, List<StartingHandCombo> listB)
         {
             if (listA.Count != listB.Count)
                 return false;
 
             for(int i = 0; i < listA.Count; i++)
             {
-                if (listA[i].Equals(listB[i], StartingHand.MatchingMode.ExactSuits) == false)
+                if (listA[i].Equals(listB[i], StartingHandCombo.MatchingMode.ExactSuits) == false)
                     return false;
             }
 
@@ -322,20 +322,20 @@ namespace PokerLib2Tests
         [TestMethod]
         public void HighCardAndLowCard_ConsistentEvenWithPPs_Pass()
         {
-            StartingHand hand = new StartingHand("9s9c");
-            StartingHand revHand = new StartingHand("9c9s");
+            StartingHandCombo hand = new StartingHandCombo("9s9c");
+            StartingHandCombo revHand = new StartingHandCombo("9c9s");
 
-            Assert.IsTrue(hand.Equals(revHand, StartingHand.MatchingMode.ExactSuits));
-            Assert.IsFalse(hand.Equals(revHand, StartingHand.MatchingMode.ExactSuits, false));
+            Assert.IsTrue(hand.Equals(revHand, StartingHandCombo.MatchingMode.ExactSuits));
+            Assert.IsFalse(hand.Equals(revHand, StartingHandCombo.MatchingMode.ExactSuits, false));
 
             Assert.IsTrue(hand.HighCard == revHand.HighCard);
             Assert.IsTrue(hand.LowCard == revHand.LowCard);
 
-            hand = new StartingHand("Th9d");
-            revHand = new StartingHand("9dTh");
+            hand = new StartingHandCombo("Th9d");
+            revHand = new StartingHandCombo("9dTh");
 
-            Assert.IsTrue(hand.Equals(revHand, StartingHand.MatchingMode.ExactSuits));
-            Assert.IsFalse(hand.Equals(revHand, StartingHand.MatchingMode.ExactSuits, false));
+            Assert.IsTrue(hand.Equals(revHand, StartingHandCombo.MatchingMode.ExactSuits));
+            Assert.IsFalse(hand.Equals(revHand, StartingHandCombo.MatchingMode.ExactSuits, false));
 
             Assert.IsTrue(hand.HighCard == revHand.HighCard);
             Assert.IsTrue(hand.LowCard == revHand.LowCard);
