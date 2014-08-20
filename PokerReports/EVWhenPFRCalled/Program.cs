@@ -112,9 +112,6 @@ namespace EVWhenPFRCalled
             //dgvSQLResults.DataSource = dt;
             Console.WriteLine(dt.Rows.Count);
                         
-            //TODO For each common PFR size
-            double[] PRFsizes = { 2, 2.5, 3 };
-
             List<StartingHandGroup> startingHands = new List<StartingHandGroup>();
             int handID = 1;
             for (Rank iRank1 = Rank.Ace; iRank1 >= Rank.Two; iRank1--)
@@ -162,8 +159,7 @@ namespace EVWhenPFRCalled
                     StartingHandGroupData newHand = new StartingHandGroupData(Convert.ToDouble((row["amt_bb_won"])), PFRSize * 2);
                     hg.Hands.Add(newHand);
                 }
-
-                //TODO Figure out the standard deviation stuff...
+                
                 Console.WriteLine(hg.Name + " Realized: " + (hg.EquityRealized() * 100).ToString("N2") + " EV(When Called) = " + hg.EVWhenCalled().ToString("N2") + " +/- " + hg.EVWhenCalledCI().ToString("N2"));
             }
 

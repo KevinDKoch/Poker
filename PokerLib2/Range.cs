@@ -321,7 +321,7 @@ namespace PokerLib2.Game
         }
 
 
-        //TODO: Implement GetHashCode()
+        //TODO Implement GetHashCode()
         public override bool Equals(object obj)
         {
             if (obj == null)

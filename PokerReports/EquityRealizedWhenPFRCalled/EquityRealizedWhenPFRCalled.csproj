@@ -4,15 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{ABA326E6-BDC1-4316-B5BE-929D6B696148}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{FEFE3F74-23D6-4A70-ACE1-D5CB0C11244F}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PokerLib2</RootNamespace>
-    <AssemblyName>PokerLib2</AssemblyName>
+    <RootNamespace>EquityRealizedWhenPFRCalled</RootNamespace>
+    <AssemblyName>EquityRealizedWhenPFRCalled</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,6 +23,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -31,7 +33,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="MathNet.Numerics">
-      <HintPath>..\PokerReports\packages\MathNet.Numerics.3.2.1\lib\net40\MathNet.Numerics.dll</HintPath>
+      <HintPath>..\packages\MathNet.Numerics.3.2.1\lib\net40\MathNet.Numerics.dll</HintPath>
+    </Reference>
+    <Reference Include="Npgsql">
+      <HintPath>..\..\..\..\Downloads\Npgsql2.0.1-bin-ms.net3.5sp1\bin\Npgsql.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -43,31 +48,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Action.cs" />
-    <Compile Include="BoardCards.cs" />
-    <Compile Include="Card.cs" />
-    <Compile Include="DealerAction.cs" />
-    <Compile Include="Deck.cs" />
-    <Compile Include="GameState.cs" />
-    <Compile Include="Player.cs" />
-    <Compile Include="PlayerAction.cs" />
-    <Compile Include="PokerEnums.cs" />
-    <Compile Include="Hand.cs" />
-    <Compile Include="PokerRegex.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PokerSite.cs" />
-    <Compile Include="PT4Helpers.cs" />
-    <Compile Include="Range.cs" />
-    <Compile Include="RankAndSuit.cs" />
-    <Compile Include="Stakes.cs" />
-    <Compile Include="StartingHand.cs" />
-    <Compile Include="StartingHandCombo.cs" />
-    <Compile Include="StartingHandData.cs" />
-    <Compile Include="StartingHandGrid.cs" />
-    <Compile Include="WeightedStartingHandCombo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\PokerLib2\PokerLib2.csproj">
+      <Project>{aba326e6-bdc1-4316-b5be-929d6b696148}</Project>
+      <Name>PokerLib2</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
