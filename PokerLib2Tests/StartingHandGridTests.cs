@@ -8,11 +8,16 @@ namespace PokerLib2Tests
     [TestClass]
     public class StartingHandGridTests
     {
-        private class EVData //: IGridReport, ICSVReport
+        private class EVData: ICSVReport
         {
             public EVData()
             {
                 EV = new double[] { };
+            }
+
+            public string CSV()
+            {
+                return EV.Mean().ToString();
             }
 
             public double[] EV { get; set; }

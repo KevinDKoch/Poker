@@ -9,6 +9,8 @@ namespace PokerLib2.Reports
 {
     public static class PT4
     {
+        public const String ConnString = "Server=127.0.0.1;Port=5434;User Id=postgres;Password=svcPASS83;Database=Main_PT4_DB;";
+
         public static Card GetCard(int id_holecard)
         {
             Rank rank = (Rank)(id_holecard % 13 + 1);

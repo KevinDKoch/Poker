@@ -5,11 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using PokerLib2;
 using PokerLib2.Game;
+using System.IO;
 
 namespace PokerLib2.Reports
 {
     public class StartingHandGrid<T> //: IEnumerable<StartingHandData<T>>
-        where T : new()//IGridReport, ICSVReport
+        where T : ICSVReport, new()//IGridReport, 
     {
         private Dictionary<string, StartingHandData<T>> _hands = new Dictionary<string,StartingHandData<T>>();
         public T Data { get; set; }
@@ -54,7 +55,35 @@ namespace PokerLib2.Reports
         {
             return _hands.Values.GetEnumerator();
         }
-        
-        //public 
+
+        /// <summary>
+        /// Writes all of the starting hands and values in properties of T to a CSV value.
+        /// </summary>
+        /// <param name="fileName">The file to create.</param>
+        public void SaveCSV(string fileName)
+        {
+            FileInfo CSVFile = new FileInfo(fileName);
+            if (CSVFile.Exists)
+                throw new ArgumentException("File already exists:" + fileName);
+
+            
+            //FileStream fs = CSVFile.Create();
+            
+            
+            
+            bool firstRow = true;
+            foreach (StartingHandData<T> hand in _hands.Values)
+            {
+                if (firstRow)
+                {
+                    StreamWriter writer = new StreamWriter(CSVFile.OpenWrite());
+                    writer.WriteLine("Hand," + hand.Data.CSVHeaders());
+                    writer.Close();
+                    firstRow = false;
+                }
+
+                hand.SaveCSV(fileName);
+            }
+        }
     }       
 }

@@ -62,6 +62,7 @@
     <Compile Include="EnumTests.cs" />
     <Compile Include="StartingHandGridTests.cs" />
     <Compile Include="StartingHandTest.cs" />
+    <Compile Include="ERWhenPFRCalledTest.cs" />
     <Compile Include="WeightedStartingHandComboTests.cs" />
   </ItemGroup>
   <ItemGroup>

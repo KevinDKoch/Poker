@@ -11,6 +11,7 @@ namespace PokerLib2.Game
     public class Range: IEquatable<Range>
     {
         protected List<WeightedStartingHandCombo> _combos = new List<WeightedStartingHandCombo>();
+        public List<WeightedStartingHandCombo> Combos { get { return _combos; } }
 
         public Range() { }
         

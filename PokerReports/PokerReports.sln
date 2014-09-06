@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokerLib2Tests", "..\PokerL
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EquityRealizedWhenPFRCalled", "EquityRealizedWhenPFRCalled\EquityRealizedWhenPFRCalled.csproj", "{FEFE3F74-23D6-4A70-ACE1-D5CB0C11244F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ERWhenCalling3Bet", "ERWhenCalling3Bet\ERWhenCalling3Bet.csproj", "{7C8DB19B-DF76-464F-910C-224159442900}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{FEFE3F74-23D6-4A70-ACE1-D5CB0C11244F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FEFE3F74-23D6-4A70-ACE1-D5CB0C11244F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FEFE3F74-23D6-4A70-ACE1-D5CB0C11244F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C8DB19B-DF76-464F-910C-224159442900}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C8DB19B-DF76-464F-910C-224159442900}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C8DB19B-DF76-464F-910C-224159442900}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C8DB19B-DF76-464F-910C-224159442900}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
